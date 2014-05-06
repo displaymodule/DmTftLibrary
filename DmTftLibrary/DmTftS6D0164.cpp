@@ -3,7 +3,7 @@
 
  Redistribution and use of this source code, part of this source code or any compiled binary
  based on this source code is permitted as long as the above copyright notice and following
- disclaimer is retained. 
+ disclaimer is retained.
 
  DISCLAIMER:
  THIS SOFTWARE IS SUPPLIED "AS IS" WITHOUT ANY WARRANTIES AND SUPPORT. DISPLAYMODULE ASSUMES
@@ -54,37 +54,36 @@ void DmTftS6D0164::sendData(uint16_t data) {
   writeBus(data);
 }
 
-void DmTftS6D0164::setAddress(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2) {
+void DmTftS6D0164::setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
   sendCommand(0x37); // Set Column
+  sendData(x0);
+  sendCommand(0x36);
   sendData(x1);
-  sendCommand(0x36); 
-  sendData(x2);
 
 
   sendCommand(0x39);  // Set Page
+  sendData(y0);
+  sendCommand(0x38);
   sendData(y1);
-  sendCommand(0x38); 
-  sendData(y2);
-  
+
   sendCommand(0x20);
-  sendData(x1);
+  sendData(x0);
   sendCommand(0x21);
-  sendData(y1);
+  sendData(y0);
   sendCommand(0x22);
 }
 
 void DmTftS6D0164::init(void) {
-  BACK_COLOR = BLACK;
-  POINT_COLOR = WHITE;
-#if defined (__AVR__)	
+  setTextColor(BLACK, WHITE);
+#if defined (__AVR__)
 /**************************************
       DM-DmTftS6D016422-102     Arduino UNO             NUM
-      
+
       RST                       A2                      16
       CS                        A3                      17
       WR                        A4                      18
       RS                        A5                      19
-      
+
       DB8                       0                       0
       DB9                       1                       1
       DB10                      2                       2
@@ -93,7 +92,7 @@ void DmTftS6D0164::init(void) {
       DB13                      5                       5
       DB14                      6                       6
       DB15                      7                       7
-      
+
 ***************************************/
   DDRD = DDRD | B11111111;  // SET PORT D AS OUTPUT
 
@@ -105,8 +104,8 @@ void DmTftS6D0164::init(void) {
   _bitmaskWR = digitalPinToBitMask(_wr);
   _pinDC = portOutputRegister(digitalPinToPort(_dc));
   _bitmaskDC = digitalPinToBitMask(_dc);
-	
-  pinMode(_rst, OUTPUT);	
+
+  pinMode(_rst, OUTPUT);
   pinMode(_cs, OUTPUT);
   pinMode(_wr, OUTPUT);
   pinMode(_dc,OUTPUT);
@@ -123,7 +122,7 @@ void DmTftS6D0164::init(void) {
 #endif
 
   sbi(_pinRST, _bitmaskRST);
-  delay(5); 
+  delay(5);
   cbi(_pinRST, _bitmaskRST);
   delay(15);
   sbi(_pinRST, _bitmaskRST);
@@ -131,9 +130,9 @@ void DmTftS6D0164::init(void) {
   sbi(_pinWR, _bitmaskWR);
   delay(15);
   cbi(_pinCS, _bitmaskCS);
-	
+
   // Power up sequence
-  sendCommand(0x11); sendData(0x001A);            // S6D0164 INIT		
+  sendCommand(0x11); sendData(0x001A);            // S6D0164 INIT
   sendCommand(0x12); sendData(0x3121);
   sendCommand(0x13); sendData(0x006C);
   sendCommand(0x14); sendData(0x4249);
@@ -161,34 +160,35 @@ void DmTftS6D0164::init(void) {
   sendCommand(0x15); sendData(0x0000);
   sendCommand(0x20); sendData(0x0000);
   sendCommand(0x21); sendData(0x0000);
-	
+
   sendCommand(0x38); sendData(0x00DB);
   sendCommand(0x39); sendData(0x0000);
   sendCommand(0x50); sendData(0x0001);
   sendCommand(0x51); sendData(0x020B);
-  sendCommand(0x52); sendData(0x0805);	
+  sendCommand(0x52); sendData(0x0805);
   sendCommand(0x53); sendData(0x0404);
   sendCommand(0x54); sendData(0x0C0C);
   sendCommand(0x55); sendData(0x000C);
   sendCommand(0x56); sendData(0x0101);
-  sendCommand(0x57); sendData(0x0400);	
+  sendCommand(0x57); sendData(0x0400);
   sendCommand(0x58); sendData(0x1108);
   sendCommand(0x59); sendData(0x050C);
   sendCommand(0x36); sendData(0x00AF);
   sendCommand(0x37); sendData(0x0000);
-  sendCommand(0x38); sendData(0x00DB);	
+  sendCommand(0x38); sendData(0x00DB);
   sendCommand(0x39); sendData(0x0000);
   sendCommand(0x0F); sendData(0x0B01);
   sendCommand(0x07); sendData(0x0016);
   delay(2);
   sendCommand(0x07); sendData(0x0017);
-  sendCommand(0x22); 
-  delay(10);	
+  sendCommand(0x22);
+  delay(10);
   sbi(_pinCS, _bitmaskCS);
-	
-  fillScreen();
+
+  clearScreen();
 }
 
 /*********************************************************************************************************
   END FILE
 *********************************************************************************************************/
+

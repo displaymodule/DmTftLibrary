@@ -3,7 +3,7 @@
 
  Redistribution and use of this source code, part of this source code or any compiled binary
  based on this source code is permitted as long as the above copyright notice and following
- disclaimer is retained. 
+ disclaimer is retained.
 
  DISCLAIMER:
  THIS SOFTWARE IS SUPPLIED "AS IS" WITHOUT ANY WARRANTIES AND SUPPORT. DISPLAYMODULE ASSUMES
@@ -18,13 +18,13 @@
 class DmTftHX8353C : public DmTftBase
 {
 public:
-  DmTftHX8353C(uint8_t mosi, uint8_t clk, uint8_t cs, uint8_t dc, uint8_t rst);
+  DmTftHX8353C(uint8_t mosi=D2, uint8_t clk=D3, uint8_t cs=D4, uint8_t dc=D5, uint8_t rst=D6);
   virtual ~DmTftHX8353C();
   void init(void);
 private:
   void send8BitData(uint8_t data);
   void writeBus(uint8_t data);
-  
+
   virtual void setAddress(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2);
   virtual void sendCommand(uint8_t index);
   virtual void sendData(uint16_t data);
@@ -40,4 +40,5 @@ private:
 #endif
 };
 #endif
+
 

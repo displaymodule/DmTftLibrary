@@ -3,7 +3,7 @@
 
  Redistribution and use of this source code, part of this source code or any compiled binary
  based on this source code is permitted as long as the above copyright notice and following
- disclaimer is retained. 
+ disclaimer is retained.
 
  DISCLAIMER:
  THIS SOFTWARE IS SUPPLIED "AS IS" WITHOUT ANY WARRANTIES AND SUPPORT. DISPLAYMODULE ASSUMES
@@ -44,7 +44,7 @@ void DmTftIli9325::writeBus(uint8_t data) {
 
 void DmTftIli9325::sendCommand(uint8_t index) {
   cbi(_pinDC, _bitmaskDC);
-  writeBus(0x00); 
+  writeBus(0x00);
   writeBus(index);
 }
 
@@ -54,36 +54,35 @@ void DmTftIli9325::sendData(uint16_t data) {
   writeBus(data);
 }
 
-void DmTftIli9325::setAddress(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2) {
+void DmTftIli9325::setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
   sendCommand(0x50); // Set Column
+  sendData(x0);
+  sendCommand(0x51);
   sendData(x1);
-  sendCommand(0x51); 
-  sendData(x2);
 
   sendCommand(0x52);  // Set Page
+  sendData(y0);
+  sendCommand(0x53);
   sendData(y1);
-  sendCommand(0x53); 
-  sendData(y2);
-  
+
   sendCommand(0x20);
-  sendData(x1);
+  sendData(x0);
   sendCommand(0x21);
-  sendData(y1);
+  sendData(y0);
   sendCommand(0x22);
 }
 
 void DmTftIli9325::init(void) {
-  BACK_COLOR = BLACK;
-  POINT_COLOR = WHITE;
-#if defined (__AVR__)	
+  setTextColor(BLACK, WHITE);
+#if defined (__AVR__)
 /**************************************
       DM-DmTftIli932522-102       Arduino UNO      NUM
-      
+
       RST                       A2                    16
       CS                        A3                     17
       WR                       A4                     18
       RS                        A5                     19
-      
+
       DB8                       0                       0
       DB9                       1                       1
       DB10                      2                      2
@@ -92,7 +91,7 @@ void DmTftIli9325::init(void) {
       DB13                      5                      5
       DB14                      6                      6
       DB15                      7                      7
-      
+
 ***************************************/
   DDRD = DDRD | B11111111;  // SET PORT D AS OUTPUT
 
@@ -104,8 +103,8 @@ void DmTftIli9325::init(void) {
   _bitmaskWR = digitalPinToBitMask(_wr);
   _pinDC = portOutputRegister(digitalPinToPort(_dc));
   _bitmaskDC = digitalPinToBitMask(_dc);
-	
-  pinMode(_rst, OUTPUT);	
+
+  pinMode(_rst, OUTPUT);
   pinMode(_cs, OUTPUT);
   pinMode(_wr, OUTPUT);
   pinMode(_dc,OUTPUT);
@@ -122,7 +121,7 @@ void DmTftIli9325::init(void) {
 #endif
 
   sbi(_pinRST, _bitmaskRST);
-  delay(5); 
+  delay(5);
   cbi(_pinRST, _bitmaskRST);
   delay(15);
   sbi(_pinRST, _bitmaskRST);
@@ -130,9 +129,9 @@ void DmTftIli9325::init(void) {
   sbi(_pinWR, _bitmaskWR);
   delay(15);
   cbi(_pinCS, _bitmaskCS);
-	
+
   sendCommand(0xE5); sendData(0x78F0);
-  sendCommand(0x01); sendData(0x0100);           
+  sendCommand(0x01); sendData(0x0100);
   sendCommand(0x02); sendData(0x0700);
   sendCommand(0x03); sendData(0x1030);
   sendCommand(0x04); sendData(0x0000);
@@ -147,7 +146,7 @@ void DmTftIli9325::init(void) {
   sendCommand(0x11); sendData(0x0007);
   sendCommand(0x12); sendData(0x0000);
   sendCommand(0x13); sendData(0x0000);
-	
+
   sendCommand(0x10); sendData(0x1290);
   sendCommand(0x11); sendData(0x0227);
   sendCommand(0x12); sendData(0x001D);
@@ -167,18 +166,18 @@ void DmTftIli9325::init(void) {
   sendCommand(0x3C); sendData(0x0405);
   sendCommand(0x3D); sendData(0x0f02);
 
-  sendCommand(0x50); sendData(0x0000);	
+  sendCommand(0x50); sendData(0x0000);
   sendCommand(0x51); sendData(0x00EF);
   sendCommand(0x52); sendData(0x0000);
   sendCommand(0x53); sendData(0x013F);
   sendCommand(0x60); sendData(0xA700);
-  sendCommand(0x61); sendData(0x0001);	
+  sendCommand(0x61); sendData(0x0001);
   sendCommand(0x6A); sendData(0x0000);
 
   sendCommand(0x80); sendData(0x0000);
   sendCommand(0x81); sendData(0x0000);
   sendCommand(0x82); sendData(0x0000);
-  sendCommand(0x83); sendData(0x0000);	
+  sendCommand(0x83); sendData(0x0000);
   sendCommand(0x84); sendData(0x0000);
   sendCommand(0x85); sendData(0x0000);
 
@@ -190,8 +189,8 @@ void DmTftIli9325::init(void) {
   sendCommand(0x98); sendData(0x0000);
   sendCommand(0x07); sendData(0x0133);
   sbi(_pinCS, _bitmaskCS);
-	
-  fillScreen();
+
+  clearScreen();
 }
 
 /*********************************************************************************************************

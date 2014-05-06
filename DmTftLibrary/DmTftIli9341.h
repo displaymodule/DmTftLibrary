@@ -3,7 +3,7 @@
 
  Redistribution and use of this source code, part of this source code or any compiled binary
  based on this source code is permitted as long as the above copyright notice and following
- disclaimer is retained. 
+ disclaimer is retained.
 
  DISCLAIMER:
  THIS SOFTWARE IS SUPPLIED "AS IS" WITHOUT ANY WARRANTIES AND SUPPORT. DISPLAYMODULE ASSUMES
@@ -24,15 +24,15 @@ public:
 #if defined (__AVR__)
   DmTftIli9341(uint8_t cs, uint8_t dc);
 #elif defined (TOOLCHAIN_ARM_MICRO)
-  DmTftIli9341(uint8_t cs, uint8_t dc, uint8_t miso, uint8_t mosi, uint8_t clk);
+  DmTftIli9341(uint8_t cs=D10, uint8_t dc=D9, uint8_t miso=D12, uint8_t mosi=D11, uint8_t clk=D13);
 #endif
   virtual ~DmTftIli9341();
   void init(void);
 private:
   void send8BitData(uint8_t data);
   void writeBus(uint8_t data);
-  
-  virtual void setAddress(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2);
+
+  virtual void setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
   virtual void sendCommand(uint8_t index);
   virtual void sendData(uint16_t data);
 
@@ -52,4 +52,5 @@ private:
 
 
 #endif
+
 

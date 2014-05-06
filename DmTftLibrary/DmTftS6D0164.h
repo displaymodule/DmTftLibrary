@@ -3,7 +3,7 @@
 
  Redistribution and use of this source code, part of this source code or any compiled binary
  based on this source code is permitted as long as the above copyright notice and following
- disclaimer is retained. 
+ disclaimer is retained.
 
  DISCLAIMER:
  THIS SOFTWARE IS SUPPLIED "AS IS" WITHOUT ANY WARRANTIES AND SUPPORT. DISPLAYMODULE ASSUMES
@@ -18,14 +18,14 @@
 class DmTftS6D0164 : public DmTftBase
 {
 public:
-  DmTftS6D0164(uint8_t wr, uint8_t cs, uint8_t dc, uint8_t rst);
+  DmTftS6D0164(uint8_t wr=A4, uint8_t cs=A3, uint8_t dc=A5, uint8_t rst=A2);
   virtual ~DmTftS6D0164();
   void init(void);
 private:
   void send8BitData(uint8_t data);
   void writeBus(uint8_t data);
-  
-  virtual void setAddress(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2);
+
+  virtual void setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
   virtual void sendCommand(uint8_t index);
   virtual void sendData(uint16_t data);
 
@@ -41,4 +41,5 @@ private:
 #endif
 };
 #endif
+
 
