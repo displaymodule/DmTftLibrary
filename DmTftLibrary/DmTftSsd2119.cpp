@@ -76,23 +76,18 @@ void DmTftSsd2119::sendData(uint16_t data) {
 }
 
 void DmTftSsd2119::setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
- 
   // Set Start and End Vertical RAM address position
   uint16_t verticalStartEndAddress;
   verticalStartEndAddress = y0&0xff; // Start vertical RAM address
   verticalStartEndAddress += (y1&0xff)<<8; // End vertical RAM address
   
-  //y0 += (y1&0xff<<8);
-  
   sendCommand(0x44);
   sendData(verticalStartEndAddress);
-    
-  // Set Start Horizontal RAM address position
-  sendCommand(0x45);
+
+  sendCommand(0x45); // Set Start Horizontal RAM address position
   sendData(x0);
   
-  // Set End Horizontal RAM address position
-  sendCommand(0x46);
+  sendCommand(0x46);   // Set End Horizontal RAM address position
   sendData(x1);
 
   // Set start position
@@ -151,116 +146,114 @@ void DmTftSsd2119::init(void) {
   cbi(_pinCS, _bitmaskCS);
   delay(135); // This much delay needed??
 
-  // ILI9341 init
   delay(120);
 
   sendCommand(0x28);    // VCOM OTP
-     sendData(0x0006);   
+  sendData(0x0006);   
 
-    sendCommand(0x00);    // start Oscillator
-     sendData(0x0001);   
+  sendCommand(0x00);    // Start Oscillator
+  sendData(0x0001);   
 
-    sendCommand(0x10);    // set Sleep mode
-      sendData(0x0000);  //Sleep out
-     delay(30);
+  sendCommand(0x10);    // Set Sleep mode
+  sendData(0x0000);     // Sleep out
+  delay(30);
 
-    sendCommand(0x11);    // Entry Mode ,SET LCM interface Mode.设置模组的显示颜色，接口方式，横竖屏及扫描方向.
-     sendData(0x6870); //  SET 65K colors,MCU interface Mode.TypeB ,ID=11 AM=0 the address counter is updated in the horizontal direction.
+  sendCommand(0x11);    // Entry Mode ,SET LCM interface Mode.
+  sendData(0x6870);     //  SET 65K colors,MCU interface Mode.TypeB ,ID=11 AM=0 the address counter is updated in the horizontal direction.
 
-    sendCommand(0x15);    // Generic Interface Control .设置DOCLK，HSYNC，VSYNC，DE
-      sendData(0x0000);
+  sendCommand(0x15);    // Generic Interface Control. DOCLK，HSYNC，VSYNC，DE
+  sendData(0x0000);
 
-    sendCommand(0x01);    // Driver Output Control,设置LCD描扫方向
-      sendData(0x72EF); //set REV,GD,BGR,SM,RL,TB
+  sendCommand(0x01);    // Driver Output Control
+  sendData(0x72EF);     // Set REV,GD,BGR,SM,RL,TB
 
-    sendCommand(0x02);    // LCD Driving Waveform Control,LCD 驱动波形控制
-     sendData(0x0600);  
+  sendCommand(0x02);    // LCD Driving Waveform Control,LCD 
+  sendData(0x0600);  
 
-    sendCommand(0x08);    // Set the scanning starting position of the gate driver.
-     sendData(0x0000); // The valid range is from 1 to 240
+  sendCommand(0x08);    // Set the scanning starting position of the gate driver.
+  sendData(0x0000);     // The valid range is from 1 to 240
      
-//****************************LCD POWER CONTROL************************************************
-
-    sendCommand(0x03);    // Power Control 1,设置VGH，VGL
-      sendData(0x6A38); //set dct=fline*4, VGH=2 x VCIX2 + VCI,VGL=-(VGH) + VCix2, DC=Fline × 8, AP=Medium to large   
+  // LCD POWER CONTROL
+  sendCommand(0x03);    // Power Control 1, VGH，VGL
+  sendData(0x6A38);     // Set dct=fline*4, VGH=2 x VCIX2 + VCI,VGL=-(VGH) + VCix2, DC=Fline × 8, AP=Medium to large   
    
-    sendCommand(0X0B);    // Frame Cycle Control.
-       sendData(0x5308); //SET NO SDT=1 clock cycle (POR) ,Sets the equalizing period,    
+  sendCommand(0X0B);    // Frame Cycle Control.
+  sendData(0x5308);     // SET NO SDT=1 clock cycle (POR) ,Sets the equalizing period,    
 
-     sendCommand(0x0C);    // Power Control 2 设VCIX2 电压
-       sendData(0x0003); //Adjust VCIX2 output voltage=5.7V
+  sendCommand(0x0C);    // Power Control 2 设VCIX2 电压
+  sendData(0x0003);     // Adjust VCIX2 output voltage=5.7V
 
-     sendCommand(0x0D);  //Set amplitude magnification of VLCD63     
-      sendData(0x000A); //vlcd63=VREF(2.0V)* 2.335V
+  sendCommand(0x0D);    // Set amplitude magnification of VLCD63     
+  sendData(0x000A);     // vlcd63=VREF(2.0V)* 2.335V
 
-     sendCommand(0x0E);     //SET VCOMG VDV .设VCOM电压
-	sendData(0x2B00);   //SET VCOMG=1,VCOM=VLCD63*  //2A 
+  sendCommand(0x0E);    // SET VCOMG VDV .设VCOM电压
+  sendData(0x2B00);     // SET VCOMG=1,VCOM=VLCD63*  //2A 
 
-     sendCommand(0X0F);    // Gate Scan Position.
-	sendData(0x0000);  //The valid range is from 1 to 240.   
+  sendCommand(0X0F);    // Gate Scan Position.
+  sendData(0x0000);     // The valid range is from 1 to 240.   
 
-     sendCommand(0x1E);    // SET nOTP VCOMH ,设VCOMH电压
-      sendData(0x00B7); //SET nOTP=0, VCOMH=VLCD63* //B8
+  sendCommand(0x1E);    // SET nOTP VCOMH ,设VCOMH电压
+  sendData(0x00B7);     // SET nOTP=0, VCOMH=VLCD63* //B8
 
-     sendCommand(0x25);    // Frame Frequency Control
-        sendData(0x8000); //SET OSC  65Hz //0A-70hz
+  sendCommand(0x25);    // Frame Frequency Control
+  sendData(0x8000);     // SET OSC  65Hz //0A-70hz
 
-     sendCommand(0x26);    // Analog setting
-	sendData(0x3800);     
+  sendCommand(0x26);    // Analog setting
+  sendData(0x3800);     
 
-     sendCommand(0x27);    // Analog setting
-	sendData(0x0078);
+  sendCommand(0x27);    // Analog setting
+  sendData(0x0078);
 
-//****************************************************************************
-     sendCommand(0x12);    // Sleep mode
-      sendData(0xD999);   
+  //
+  sendCommand(0x12);    // Sleep mode
+  sendData(0xD999);   
 
-//***************************SET WINDOW ************************************************
+  // SET WINDOW
+  sendCommand(0x4E);    // Ram Address Set
+  sendData(0x0000);      
 
-     sendCommand(0x4E);    // Ram Address Set
-	sendData(0x0000);      
+  sendCommand(0x4F);    // Ram Address Set
+  sendData(0x0000);    
 
-     sendCommand(0x4F);    // Ram Address Set
-	sendData(0x0000);    
+  //  Gamma Control
+  sendCommand(0x30);
+  sendData(0x0000);//1
 
-//******************* Gamma Control ************************************************
-	sendCommand(0x30);
-	sendData(0x0000);//1
+  sendCommand(0x31);
+  sendData(0x0104);//2
 
-	sendCommand(0x31);
-	sendData(0x0104);//2
+  sendCommand(0x32);
+  sendData(0x0100);//3
 
-	sendCommand(0x32);
-	sendData(0x0100);//3
+  sendCommand(0x33);
+  sendData(0x0305);//4
 
-	sendCommand(0x33);
-	sendData(0x0305);//4
+  sendCommand(0x34);
+  sendData(0x0505);//4
 
-	sendCommand(0x34);
-	sendData(0x0505);//4
+  sendCommand(0x35);
+  sendData(0x0305);//5
 
-	sendCommand(0x35);
-	sendData(0x0305);//5
+  sendCommand(0x36);
+  sendData(0x0707);//6
 
-	sendCommand(0x36);
-	sendData(0x0707);//6
+  sendCommand(0x37);
+  sendData(0x0300);//7
 
-	sendCommand(0x37);
-	sendData(0x0300);//7
+  sendCommand(0x3A);
+  sendData(0x1200);//8
 
-	sendCommand(0x3A);
-	sendData(0x1200);//8
-
-	sendCommand(0x3B);
-	sendData(0x0800);//9	
+  sendCommand(0x3B);
+  sendData(0x0800);//9	
 	 
-//**************************************************************************
-        delay(300);
-        sendCommand(0x07);    // Display Control 
-	sendData(0x0033);  // Display on 
-         delay(100);
+  // Final init
+  delay(300);
+  sendCommand(0x07);	// Display Control 
+  
+  sendData(0x0033);		// Display on 
+  delay(100);
 
-        sendCommand(0x22);    // RAM data write/read
+  sendCommand(0x22);    // RAM data write/read
 		
   delay(50);
   sbi(_pinCS, _bitmaskCS);
