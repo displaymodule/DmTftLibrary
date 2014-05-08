@@ -10,19 +10,35 @@
  NO RESPONSIBILITY OR LIABILITY FOR THE USE OF THE SOFTWARE.
  ********************************************************************************************/
 #include <SPI.h>
-#include <DmTftIli9341.h>
+#include <DmTftSsd2119.h>
 
 int bmpWidth, bmpHeight;
 uint8_t bmpImageoffset;
 extern uint8_t dmlogo[];
 
-DmTftIli9341 tft = DmTftIli9341(10, 9);
+#define TFT_CS  10
+#define SD_CS   8
+#define F_CS    6
+#define T_CS    4
+
+DmTftSsd2119 tft = DmTftSsd2119(10, 9);
 
 void setup()
 {
+      // Set CS SPI pin HIGH for all SPI units, so they don't interfere
+  pinMode(TFT_CS, OUTPUT);
+  digitalWrite(TFT_CS, HIGH);
+  pinMode(T_CS, OUTPUT);
+  digitalWrite(T_CS, HIGH);
+  pinMode(SD_CS, OUTPUT);
+  digitalWrite(SD_CS, HIGH);
+  pinMode(F_CS, OUTPUT);
+  digitalWrite(F_CS, HIGH);
+  
   Serial.begin(9600);
   tft.init();
   
+  //delay(2000);
   if (! bmpReadHeader()) { 
     Serial.println("bad bmp");
     return;

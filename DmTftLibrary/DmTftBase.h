@@ -82,7 +82,7 @@ public:
 
   void setTextColor(uint16_t background, uint16_t foreground) { _bgColor = background; _fgColor = foreground; }
 
-  void setPixel(uint16_t x, uint16_t y, uint16_t color);
+  virtual void setPixel(uint16_t x, uint16_t y, uint16_t color);
 
   void clearScreen(uint16_t color = BLACK);
 

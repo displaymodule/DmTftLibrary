@@ -29,13 +29,13 @@ void setup()
   drawBmpFromFlash(0, 0);
   drawBmpFromFlash(0, 130);
    
-  tft.showString(0,32,"www.");
-  tft.showString(12,48,"displaymodule");
-  tft.showString(88,64,".com");
+  tft.drawString(0,32,"www.");
+  tft.drawString(12,48,"displaymodule");
+  tft.drawString(88,64,".com");
 
-  tft.drawRectangle(20,85,20,20,GREEN); 
+  tft.drawRectangle(20,85,40,105,GREEN); 
   tft.drawCircle(60,95,10,BLUE);
-  tft.drawTraingle(90,85, 80,105,100,105, RED);
+  tft.drawTriangle(90,85, 80,105,100,105, RED);
 }
 
 void loop()
