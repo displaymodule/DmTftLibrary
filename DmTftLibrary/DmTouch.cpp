@@ -65,6 +65,14 @@ DmTouch::DmTouch(Display disp, int8_t cs, int8_t irq, int8_t clk, int8_t mosi, i
       _calibInvertedTouch = true;
       break;
 
+	case DmTouch::DM_TFT35_107:
+      _calibLowX = 912;
+      _calibLowY = 422 ;
+      _calibModifierX = 3.25;
+      _calibModifierY = 1.175;
+      _calibInvertedTouch = false;
+	  break;
+	  
     case DmTouch::DM_TFT28_105:
     default:
       _calibLowX = 260;
@@ -229,10 +237,10 @@ void DmTouch::readTouchData(uint16_t& posX, uint16_t& posY, bool& touching) {
 
   sbi(_pinCS, _bitmaskCS);
 
-//  Serial.print("Raw X: ");
-//  Serial.println(TP_X);
-//  Serial.print("Raw Y: ");
-//  Serial.println(TP_Y);
+ Serial.print("Raw X: ");
+ Serial.println(TP_X);
+ Serial.print("Raw Y: ");
+ Serial.println(TP_Y);
 
   // Convert raw data to screen positions
   if (_calibInvertedTouch) {
@@ -262,6 +270,7 @@ uint8_t DmTouch::isTouched() {
   }
 
   if ( !gbi(_pinIrq, _bitmaskIrq) ) {
+    Serial.println("IsTouched");
     return true;
   }
 

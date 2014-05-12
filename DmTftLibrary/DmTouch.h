@@ -59,6 +59,7 @@ public:
     DM_TFT28_103,
     DM_TFT24_104,
     DM_TFT28_105,
+	DM_TFT35_107,
   };
 
 #if defined (__AVR__)

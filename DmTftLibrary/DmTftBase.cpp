@@ -293,8 +293,7 @@ void DmTftBase::drawString(uint16_t x, uint16_t y, const char *p) {
   }
 }
 
-void DmTftBase::drawImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint16_t* data)
-{
+void DmTftBase::drawImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint16_t* data) {
   const uint16_t* p = data;
 
   cbi(_pinCS, _bitmaskCS);
@@ -305,5 +304,13 @@ void DmTftBase::drawImage(uint16_t x, uint16_t y, uint16_t width, uint16_t heigh
     p++;
   }
 
+  sbi(_pinCS, _bitmaskCS);
+}
+
+void DmTftBase::select(){
+  cbi(_pinCS, _bitmaskCS);
+}
+
+void DmTftBase::unSelect() {
   sbi(_pinCS, _bitmaskCS);
 }

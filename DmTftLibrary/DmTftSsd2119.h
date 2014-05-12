@@ -30,15 +30,15 @@ public:
   void init(void);
   virtual void setPixel(uint16_t x, uint16_t y, uint16_t color);
 
+  virtual void setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+  virtual void sendData(uint16_t data);
+  
 private:
   void send8BitData(uint8_t data);
   void writeBus(uint8_t data);
 
-  virtual void setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
   virtual void sendCommand(uint8_t index);
-  virtual void sendData(uint16_t data);
 
-  
   uint8_t _cs, _dc;
   static const uint16_t _width;
   static const uint16_t _height;

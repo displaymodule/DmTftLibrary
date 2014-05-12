@@ -83,7 +83,9 @@ public:
   void setTextColor(uint16_t background, uint16_t foreground) { _bgColor = background; _fgColor = foreground; }
 
   virtual void setPixel(uint16_t x, uint16_t y, uint16_t color);
-
+  virtual void setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) = 0;
+  virtual void sendData(uint16_t data) = 0;
+  
   void clearScreen(uint16_t color = BLACK);
 
   void drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
@@ -105,12 +107,11 @@ public:
   void drawString(uint16_t x, uint16_t y, const char *p);
 
   void drawImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint16_t* data);
-
+  
+  void select();
+  void unSelect();
 protected:
-
-  virtual void setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) = 0;
   virtual void sendCommand(uint8_t index) = 0;
-  virtual void sendData(uint16_t data) = 0;
 
 #if defined (__AVR__)
   regtype *_pinCS;
