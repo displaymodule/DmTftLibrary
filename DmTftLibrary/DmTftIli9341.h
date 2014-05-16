@@ -14,16 +14,13 @@
 #define DM_TFT_ILI9341_h
 
 #include "DmTftBase.h"
-#if defined (__AVR__)
-  #include <SPI.h>
-#elif defined (TOOLCHAIN_ARM_MICRO)
-#endif
+
 class DmTftIli9341 : public DmTftBase
 {
 public:
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
   DmTftIli9341(uint8_t cs, uint8_t dc);
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   DmTftIli9341(uint8_t cs=D10, uint8_t dc=D9, uint8_t miso=D12, uint8_t mosi=D11, uint8_t clk=D13);
 #endif
   virtual ~DmTftIli9341();
@@ -39,11 +36,11 @@ private:
   uint8_t _cs, _dc;
   static const uint16_t _width;
   static const uint16_t _height;
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
   regtype *_pinDC;
   regsize _bitmaskDC;
   uint8_t _spiSettings;
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   uint8_t _miso, _mosi, _clk;
   DigitalOut *_pinDC;
   SPI *_spi;

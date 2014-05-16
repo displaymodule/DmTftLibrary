@@ -11,15 +11,15 @@
  ********************************************************************************************/
 
 #include "DmTftIli9341.h"
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
 DmTftIli9341::DmTftIli9341(uint8_t cs, uint8_t dc)
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
 DmTftIli9341::DmTftIli9341(uint8_t cs, uint8_t dc, uint8_t miso, uint8_t mosi, uint8_t clk)
 #endif
 : DmTftBase(240, 320){
   _cs = cs;
   _dc = dc;
-#if defined (TOOLCHAIN_ARM_MICRO)
+#if defined (DM_TOOLCHAIN_MBED)
   _miso = miso;
   _mosi = mosi;
   _clk = clk;
@@ -27,7 +27,7 @@ DmTftIli9341::DmTftIli9341(uint8_t cs, uint8_t dc, uint8_t miso, uint8_t mosi, u
 }
 
 DmTftIli9341::~DmTftIli9341() {
-#if defined (TOOLCHAIN_ARM_MICRO)
+#if defined (DM_TOOLCHAIN_MBED)
 delete _pinCS;
 delete _pinDC;
 delete _spi;
@@ -39,11 +39,11 @@ _spi = NULL;
 }
 
 void DmTftIli9341::writeBus(uint8_t data) {
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
   SPCR = _spiSettings;         // SPI Control Register
   SPDR = data;                 // SPI Data Register
   while(!(SPSR & _BV(SPIF)));  // SPI Status Register Wait for transmission to finish
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   _spi->write(data);
 #endif
 }
@@ -88,7 +88,7 @@ void DmTftIli9341::setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1
 
 void DmTftIli9341::init(void) {
   setTextColor(BLACK, WHITE);
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
   _pinCS  = portOutputRegister(digitalPinToPort(_cs));
   _bitmaskCS  = digitalPinToBitMask(_cs);
   _pinDC  = portOutputRegister(digitalPinToPort(_dc));
@@ -103,7 +103,7 @@ void DmTftIli9341::init(void) {
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
   _spiSettings = SPCR;
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   _pinCS = new DigitalOut((PinName)_cs);
   _pinDC = new DigitalOut((PinName)_dc);
   sbi(_pinCS, _bitmaskCS);

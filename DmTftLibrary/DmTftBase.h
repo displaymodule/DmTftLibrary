@@ -12,35 +12,8 @@
 #ifndef DMTFTBASE_h
 #define DMTFTBASE_h
 
-#if defined (__AVR__)
-  #include <Arduino.h>
-  #include <avr/pgmspace.h>
-  #define cbi(reg, _bitmask) *reg &= ~_bitmask
-  #define sbi(reg, _bitmask) *reg |= _bitmask
-  #define pulse_high(reg, _bitmask) sbi(reg, _bitmask); cbi(reg, _bitmask);
-  #define pulse_low(reg, _bitmask) cbi(reg, _bitmask); sbi(reg, _bitmask);
+#include "dm_platform.h"
 
-  #define D2   2
-  #define D3   3
-  #define D4   4
-  #define D5   5
-  #define D6   6
-  #define D9   9
-  #define D10 10
-  #define A2  16
-  #define A3  17
-  #define A4  18
-  #define A5  19
-
-#elif defined (TOOLCHAIN_ARM_MICRO)
-  #include "mbed.h"
-  #define sbi(reg, _bitmask) *reg = 1;
-  #define cbi(reg, _bitmask) *reg = 0;
-  #define pulse_high(reg, _bitmask) *reg = 1; *reg = 0;
-  #define pulse_low(reg, _bitmask) *reg = 0; *reg = 1;
-  #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
-  #define delay(ms) wait_ms(ms);
-#endif
 
 //Basic Colors
 #define RED     0xf800
@@ -56,21 +29,6 @@
 #define GRAY1       0x8410
 #define GRAY2       0x4208
 
-#ifndef uint8_t
-  #define uint8_t unsigned char
-#endif
-#ifndef uint16_t
-  #define uint16_t unsigned short
-#endif
-#ifndef uint32_t
-  #define uint32_t unsigned long
-#endif
-#ifndef regtype
-  #define regtype volatile unsigned char
-#endif
-#ifndef regsize
-  #define regsize unsigned char
-#endif
 
 class DmTftBase {
 public:
@@ -105,6 +63,7 @@ public:
   void drawChar(uint16_t x, uint16_t y, char ch, bool transparent);
   void drawNumber(uint16_t x, uint16_t y, int num, int digitsToShow, bool leadingZeros=false);
   void drawString(uint16_t x, uint16_t y, const char *p);
+  void drawStringCentered(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const char *p);
 
   void drawImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint16_t* data);
   
@@ -113,10 +72,10 @@ public:
 protected:
   virtual void sendCommand(uint8_t index) = 0;
 
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
   regtype *_pinCS;
   regsize _bitmaskCS;
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   DigitalOut* _pinCS;
   uint8_t _bitmaskCS;
 #endif
@@ -129,5 +88,7 @@ private:
   uint16_t _fgColor;
 };
 #endif
+
+
 
 

@@ -15,11 +15,6 @@
 
 #include "DmTftBase.h"
 
-// Special handling for the LPC1549 LPCXpresso board
-#ifdef LPC15XX_H
-  #define D5 P0_11
-#endif
-
 class DmTftIli9325 : public DmTftBase
 {
 public:
@@ -37,10 +32,10 @@ private:
   uint8_t _wr, _cs, _dc, _rst;
   static const uint16_t _width;
   static const uint16_t _height;
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
   regtype *_pinDC, *_pinRST, *_pinWR;
   regsize _bitmaskDC, _bitmaskRST, _bitmaskWR;
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   DigitalOut* _pinDC, *_pinRST, *_pinWR;
   BusOut *_virtualPortD;
 #endif

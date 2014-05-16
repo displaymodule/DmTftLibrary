@@ -20,7 +20,7 @@ DmTftS6D0164::DmTftS6D0164(uint8_t wr, uint8_t cs, uint8_t dc, uint8_t rst) : Dm
 }
 
 DmTftS6D0164::~DmTftS6D0164() {
-#if defined (TOOLCHAIN_ARM_MICRO)
+#if defined (DM_TOOLCHAIN_MBED)
   delete _pinRST;
   delete _pinCS;
   delete _pinWR;
@@ -35,9 +35,9 @@ DmTftS6D0164::~DmTftS6D0164() {
 }
 
 void DmTftS6D0164::writeBus(uint8_t data) {
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
   PORTD = data;
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   *_virtualPortD = data;
 #endif
   pulse_low(_pinWR, _bitmaskWR);
@@ -75,7 +75,7 @@ void DmTftS6D0164::setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1
 
 void DmTftS6D0164::init(void) {
   setTextColor(BLACK, WHITE);
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
 /**************************************
       DM-DmTftS6D016422-102     Arduino UNO             NUM
 
@@ -109,16 +109,16 @@ void DmTftS6D0164::init(void) {
   pinMode(_cs, OUTPUT);
   pinMode(_wr, OUTPUT);
   pinMode(_dc,OUTPUT);
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   _pinRST = new DigitalOut((PinName)_rst);
   _pinCS = new DigitalOut((PinName)_cs);
   _pinWR = new DigitalOut((PinName)_wr);
   _pinDC = new DigitalOut((PinName)_dc);
-#endif
-#ifdef LPC15XX_H
-  _virtualPortD = new BusOut(D0, D1, D2, D3, D4, P0_11, D6, D7);
-#elif defined (TOOLCHAIN_ARM_MICRO)
-  _virtualPortD = new BusOut(D0, D1, D2, D3, D4, D5, D6, D7);
+  #ifdef LPC15XX_H
+    _virtualPortD = new BusOut(D0, D1, D2, D3, D4, P0_11, D6, D7);
+  #else
+    _virtualPortD = new BusOut(D0, D1, D2, D3, D4, D5, D6, D7);
+  #endif
 #endif
 
   sbi(_pinRST, _bitmaskRST);

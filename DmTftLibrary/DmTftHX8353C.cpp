@@ -21,7 +21,7 @@ DmTftHX8353C::DmTftHX8353C(uint8_t mosi, uint8_t clk, uint8_t cs, uint8_t dc, ui
 }
 
 DmTftHX8353C::~DmTftHX8353C() {
-#if defined (TOOLCHAIN_ARM_MICRO)
+#if defined (DM_TOOLCHAIN_MBED)
   delete _pinMOSI;
   delete _pinCLK;
   delete _pinCS;
@@ -132,7 +132,7 @@ void DmTftHX8353C::setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1
 
 void DmTftHX8353C::init (void) {
   setTextColor(BLACK, WHITE);
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
   _pinMOSI= portOutputRegister(digitalPinToPort(_mosi));
   _bitmaskMOSI= digitalPinToBitMask(_mosi);
   _pinCLK= portOutputRegister(digitalPinToPort(_clk));
@@ -149,7 +149,7 @@ void DmTftHX8353C::init (void) {
   pinMode(_cs,OUTPUT);
   pinMode(_dc,OUTPUT);
   pinMode(_rst,OUTPUT);
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   _pinMOSI = new DigitalOut((PinName)_mosi);
   _pinCLK = new DigitalOut((PinName)_clk);
   _pinCS = new DigitalOut((PinName)_cs);

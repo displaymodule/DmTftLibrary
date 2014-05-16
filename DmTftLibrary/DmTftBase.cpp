@@ -16,10 +16,15 @@
 #define FONT_CHAR_HEIGHT  16
 extern uint8_t font[];
 
-#if defined (__AVR__)
+/*
+ * Macro to read the 8 bits representing one line of a character.
+ * The macro is needed as the reading is handled differently on
+ * Arduino and Mbed platforms.
+ */
+#if defined (DM_TOOLCHAIN_ARDUINO)
   #define read_font_line(__char, __line) \
       pgm_read_byte(&font[((uint16_t)(__char))*FONT_CHAR_HEIGHT+(__line)])
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   #define read_font_line(__char, __line) \
       font[((uint16_t)(__char))*FONT_CHAR_HEIGHT+(__line)]
 #endif
@@ -291,6 +296,18 @@ void DmTftBase::drawString(uint16_t x, uint16_t y, const char *p) {
     x += FONT_CHAR_WIDTH;
     p++;
   }
+}
+
+void DmTftBase::drawStringCentered(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const char *p) {
+  int len = strlen(p);
+  uint16_t tmp = len * FONT_CHAR_WIDTH;
+  if (tmp <= width) {
+    x += (width - tmp)/2;
+  }
+  if (FONT_CHAR_HEIGHT <= height) {
+    y += (height - FONT_CHAR_HEIGHT)/2;
+  }
+  drawString(x, y, p);
 }
 
 void DmTftBase::drawImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint16_t* data) {

@@ -11,7 +11,7 @@
  ********************************************************************************************/
 
 #include <SPI.h>
-#include <SPIFlash.h> // SPIFlash library from lowpowerlab
+#include <SPIFlash.h> // SPIFlash library from lowpowerlab (https://github.com/LowPowerLab/SPIFlash)
 #include <SD.h>
 #include <DmTftIli9341.h>
 #include <utility/DmDrawBmpFromSpiFlash.h>

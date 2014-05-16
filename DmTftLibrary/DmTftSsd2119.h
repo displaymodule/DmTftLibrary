@@ -14,10 +14,7 @@
 #define DM_TFT_SSD2119_h
 
 #include "DmTftBase.h"
-#if defined (__AVR__)
-  #include <SPI.h>
-#elif defined (TOOLCHAIN_ARM_MICRO)
-#endif
+
 class DmTftSsd2119 : public DmTftBase
 {
 public:
@@ -42,11 +39,11 @@ private:
   uint8_t _cs, _dc;
   static const uint16_t _width;
   static const uint16_t _height;
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
   regtype *_pinDC;
   regsize _bitmaskDC;
   uint8_t _spiSettings;
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   uint8_t _miso, _mosi, _clk;
   DigitalOut *_pinDC;
   SPI *_spi;

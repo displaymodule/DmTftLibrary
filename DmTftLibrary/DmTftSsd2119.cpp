@@ -11,15 +11,15 @@
  ********************************************************************************************/
 
 #include "DmTftSsd2119.h"
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
 DmTftSsd2119::DmTftSsd2119(uint8_t cs, uint8_t dc)
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
 DmTftSsd2119::DmTftSsd2119(uint8_t cs, uint8_t dc, uint8_t miso, uint8_t mosi, uint8_t clk)
 #endif
 : DmTftBase(320, 240){ // Display is in landscape mode by default width: 320, height: 240
   _cs = cs;
   _dc = dc;
-#if defined (TOOLCHAIN_ARM_MICRO)
+#if defined (DM_TOOLCHAIN_MBED)
   _miso = miso;
   _mosi = mosi;
   _clk = clk;
@@ -27,7 +27,7 @@ DmTftSsd2119::DmTftSsd2119(uint8_t cs, uint8_t dc, uint8_t miso, uint8_t mosi, u
 }
 
 DmTftSsd2119::~DmTftSsd2119() {
-#if defined (TOOLCHAIN_ARM_MICRO)
+#if defined (DM_TOOLCHAIN_MBED)
 delete _pinCS;
 delete _pinDC;
 delete _spi;
@@ -39,11 +39,11 @@ _spi = NULL;
 }
 
 void DmTftSsd2119::writeBus(uint8_t data) {
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
   SPCR = _spiSettings;         // SPI Control Register
   SPDR = data;                 // SPI Data Register
   while(!(SPSR & _BV(SPIF)));  // SPI Status Register Wait for transmission to finish
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   _spi->write(data);
 #endif
 }
@@ -119,7 +119,7 @@ void DmTftSsd2119::setPixel(uint16_t x, uint16_t y, uint16_t color) {
 
 void DmTftSsd2119::init(void) {
   setTextColor(BLACK, WHITE);
-#if defined (__AVR__)
+#if defined (DM_TOOLCHAIN_ARDUINO)
   _pinCS  = portOutputRegister(digitalPinToPort(_cs));
   _bitmaskCS  = digitalPinToBitMask(_cs);
   _pinDC  = portOutputRegister(digitalPinToPort(_dc));
@@ -134,7 +134,7 @@ void DmTftSsd2119::init(void) {
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
   _spiSettings = SPCR;
-#elif defined (TOOLCHAIN_ARM_MICRO)
+#elif defined (DM_TOOLCHAIN_MBED)
   _pinCS = new DigitalOut((PinName)_cs);
   _pinDC = new DigitalOut((PinName)_dc);
   sbi(_pinCS, _bitmaskCS);
