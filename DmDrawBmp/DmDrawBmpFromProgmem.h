@@ -10,37 +10,30 @@
  NO RESPONSIBILITY OR LIABILITY FOR THE USE OF THE SOFTWARE.
  ********************************************************************************************/
 
-#ifndef DM_DRAW_BMP_BASE_h
-#define DM_DRAW_BMP_BASE_h
+#ifndef DM_DRAW_BMP_FROM_PROGMEM_h
+#define DM_DRAW_BMP_FROM_PROGMEM_h
 
 #include <Arduino.h>
+//#include <SPI.h>
+//#include <SPIFlash.h> // SPIFlash library from lowpowerlab
+#include <avr/pgmspace.h>
 #include <DmTftBase.h>
+#include "DmDrawBmpBase.h"
 
-class DmDrawBmpBase {
+class DmDrawBmpFromProgmem : public DmDrawBmpBase
+{
+public:
+  boolean printHeaderInfo(uint8_t* imageBuffer);
+  boolean drawImage(uint8_t* imageBuffer, DmTftBase& tft, uint16_t x, uint16_t y);
 protected:
-  virtual boolean draw565Bitmap(DmTftBase& tft, uint16_t x, uint16_t y) = 0;
-  virtual boolean draw888Bitmap(DmTftBase& tft, uint16_t x, uint16_t y) = 0;
-  virtual void setPosition(uint32_t newPosition) = 0;
-  virtual uint16_t read16() = 0;
+  virtual boolean draw565Bitmap(DmTftBase& tft, uint16_t x, uint16_t y);
+  virtual boolean draw888Bitmap(DmTftBase& tft, uint16_t x, uint16_t y);
+  virtual void setPosition(uint32_t newPosition);
+  virtual uint16_t read16();
   virtual uint32_t read32();
   virtual int32_t readInt32();
-  
-  void printBmpHeaderInfo();
-  boolean readBmpHeader();
-  boolean IsValid888Bitmap();
-  boolean IsValid565Bitmap();
-  boolean Is565ColorMask();
-  uint16_t Convert888to565(uint8_t red, uint8_t green, uint8_t blue);
-
-  uint32_t _fileSize;
-  uint32_t _bitmapOffset;
-
-  uint32_t _headerSize;
-  int32_t _width, _height;
-  uint16_t _bitsPerPixel;
-  uint32_t _compression;
-  uint32_t _redMask;
-  uint32_t _greenMask;
-  uint32_t _blueMask;
+private:
+  uint8_t* _imageBuffer;
+  uint32_t _filePosition; // Used when parsing header
 };
 #endif
