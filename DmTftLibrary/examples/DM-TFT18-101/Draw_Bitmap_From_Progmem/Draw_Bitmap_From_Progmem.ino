@@ -12,31 +12,16 @@
 #include <SPI.h>
 #include <SPIFlash.h>
 #include <SD.h>
-#include <DmTftIli9341.h>
+#include <DmTftHX8353C.h>
 #include <DmDrawBmpFromProgmem.h>
 
-#define TFT_CS  10
-#define SD_CS   8
-#define F_CS    6
-#define T_CS    4
-
-DmTftIli9341 tft = DmTftIli9341(10, 9);
+DmTftHX8353C tft = DmTftHX8353C();
 DmDrawBmpFromProgmem drawImage = DmDrawBmpFromProgmem();
 
 extern uint8_t dmlogo[];
 
 void setup()
 {
-  // Set CS SPI pin HIGH for all SPI units, so they don't interfere
-  pinMode(TFT_CS, OUTPUT);
-  pinMode(T_CS, OUTPUT);
-  pinMode(SD_CS, OUTPUT);
-  pinMode(F_CS, OUTPUT);
-  digitalWrite(TFT_CS, HIGH);
-  digitalWrite(T_CS, HIGH);
-  digitalWrite(SD_CS, HIGH);
-  digitalWrite(F_CS, HIGH);
-  
   Serial.begin(9600);
   tft.init();
    

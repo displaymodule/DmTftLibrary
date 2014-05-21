@@ -12,7 +12,7 @@
 #include <SPI.h>
 #include <SPIFlash.h>
 #include <SD.h>
-#include <DmTftIli9341.h>
+#include <DmTftSsd2119.h>
 #include <DmDrawBmpFromProgmem.h>
 
 #define TFT_CS  10
@@ -20,7 +20,7 @@
 #define F_CS    6
 #define T_CS    4
 
-DmTftIli9341 tft = DmTftIli9341(10, 9);
+DmTftSsd2119 tft = DmTftSsd2119(10, 9);
 DmDrawBmpFromProgmem drawImage = DmDrawBmpFromProgmem();
 
 extern uint8_t dmlogo[];
