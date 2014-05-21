@@ -13,7 +13,7 @@
 #include <SPIFlash.h>
 #include <SD.h>
 #include <DmTftSsd2119.h>
-#include <utility\DmDrawBmpFromSdCard.h>
+#include <DmDrawBmpFromSdCard.h>
 
 #define TFT_CS  10
 #define SD_CS   8

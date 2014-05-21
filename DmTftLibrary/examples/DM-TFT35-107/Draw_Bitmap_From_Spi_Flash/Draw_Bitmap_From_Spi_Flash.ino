@@ -14,7 +14,7 @@
 #include <SPIFlash.h> // SPIFlash library from lowpowerlab (https://github.com/LowPowerLab/SPIFlash)
 #include <SD.h>
 #include <DmTftSsd2119.h>
-#include <utility/DmDrawBmpFromSpiFlash.h>
+#include <DmDrawBmpFromSpiFlash.h>
 
 #define TFT_CS  10
 #define SD_CS   8

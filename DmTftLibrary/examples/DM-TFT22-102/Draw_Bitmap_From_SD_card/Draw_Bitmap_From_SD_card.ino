@@ -13,7 +13,7 @@
 #include <SPIFlash.h>
 #include <SD.h>
 #include <DmTftS6D0164.h>
-#include <utility\DmDrawBmpFromSdCard.h>
+#include <DmDrawBmpFromSdCard.h>
 
 #define SD_CS   10
 
