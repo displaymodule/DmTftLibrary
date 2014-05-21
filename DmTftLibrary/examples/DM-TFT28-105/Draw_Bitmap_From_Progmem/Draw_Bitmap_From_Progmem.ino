@@ -23,7 +23,7 @@
 DmTftIli9341 tft = DmTftIli9341(10, 9);
 DmDrawBmpFromProgmem drawImage = DmDrawBmpFromProgmem();
 
-extern uint8_t dl_h565_t2[];
+extern uint8_t dmlogo[];
 
 void setup()
 {
@@ -40,7 +40,7 @@ void setup()
   Serial.begin(9600);
   tft.init();
    
-  if (! drawImage.printHeaderInfo(dl_h565_t2)) {
+  if (! drawImage.printHeaderInfo(dmlogo)) {
     Serial.println(F("Can not open bitmap."));
     return;
   }
@@ -48,7 +48,7 @@ void setup()
   uint32_t startTime, endTime;
   
   startTime = millis();
-  drawImage.drawImage(dl_h565_t2, tft, 10, 0);
+  drawImage.drawImage(dmlogo, tft, 10, 0);
   endTime = millis();
   Serial.print("Draw Image: ");
   Serial.print(endTime - startTime, DEC);

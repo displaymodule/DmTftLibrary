@@ -1,16 +1,16 @@
 /********************************************************
-File name:       dl_h565_t2.c
+File name:       dmlogo.c
 File size:       7494
 Convertion date: 2014-05-19 15:56:45
 
-File generated using DisplayModule's binaryconverter
+File generated using DisplayModule's Image Converter
 ********************************************************/
 
 #if defined (__AVR__)
   #include <avr/pgmspace.h>
-  const prog_uchar dl_h565_t2[0x1D46] PROGMEM ={
+  const prog_uchar dmlogo[0x1D46] PROGMEM ={
 #else
-  const unsigned char dl_h565_t2[0x1D46] PROGMEM ={
+  const unsigned char dmlogo[0x1D46] PROGMEM ={
 #endif
 
   0x42, 0x4D, 0x46, 0x1D, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x46, 0x0, 0x0, 0x0, 0x38, 0x0, 0x0, 0x0, 0x80, 0x0, 0x0, 0x0, 0xE3, 0xFF, 0xFF, 0xFF, 0x1, 0x0, 0x10, 0x0, 0x3, 0x0, 
