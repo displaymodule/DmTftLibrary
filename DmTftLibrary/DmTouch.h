@@ -15,39 +15,53 @@
 
 #include "dm_platform.h"
 
+typedef struct calibrationMatrix {
+  int32_t  a, b, c,	d, e, f;
+} CalibrationMatrix;
+
 class DmTouch
 {
 public:
   enum Display {
-    DM_TFT28_103,
-    DM_TFT24_104,
-    DM_TFT28_105,
-	DM_TFT35_107
+    DM_TFT28_103 = 103,
+    DM_TFT24_104 = 104,
+    DM_TFT28_105 = 105,
+	DM_TFT35_107 = 107
   };
-
-#if defined (DM_TOOLCHAIN_ARDUINO)
-  DmTouch(Display disp, uint8_t cs, int8_t tIrq = -1, int8_t hardwareSpi = 1, uint8_t clk = -1, uint8_t mosi = -1, uint8_t miso = -1, uint16_t width = 240, uint16_t height = 320);
-#elif defined (DM_TOOLCHAIN_MBED)
-  DmTouch(Display disp, bool hardwareSPI=true);
-#endif
+  
+  enum SpiMode {
+	Auto,
+	Software,
+	Hardware
+  };
+  
+  DmTouch(Display disp, SpiMode spiMode=Auto, bool useIrq=true);
   void init();
   void readTouchData(uint16_t& posX, uint16_t& posY, bool& touching);
-  uint8_t isTouched();
+  bool isTouched();
+  bool getMiddleXY(uint16_t &x, uint16_t &y); // Raw Touch Data, used for calibration
+  void setCalibrationMatrix(CalibrationMatrix calibrationMatrix);
+  void setPrecison(uint8_t samplesPerMeasurement);
+  void waitForTouch();
+  void waitForTouchRelease();
+  uint32_t rescaleFactor() { return 1000000; };
 private:
   void spiWrite(uint8_t data);
   uint8_t spiRead();
   uint16_t readData12(uint8_t command);
   void enableIrq();
-
-  uint16_t _width, _height;
-  uint8_t _cs, _clk, _mosi, _miso;
-  uint8_t _irq;
-
-  int _calibLowX, _calibLowY;
-  float _calibModifierX, _calibModifierY;
-  bool _calibInvertedTouch;
+  void readRawData(uint16_t &x, uint16_t &y);
+  void getAverageXY(uint16_t &x, uint16_t &y);
+  uint16_t getDisplayCoordinateX(uint16_t x_touch, uint16_t y_touch);
+  uint16_t getDisplayCoordinateY(uint16_t x_touch, uint16_t y_touch);
+  uint16_t calculateMiddleValue(uint16_t values[], uint8_t count);
+  bool isSampleValid();
+  
   bool _hardwareSpi;
-
+  uint8_t _samplesPerMeasurement;
+  CalibrationMatrix _calibrationMatrix;
+  uint8_t _cs, _clk, _mosi, _miso;
+  int8_t _irq;
 #if defined (DM_TOOLCHAIN_ARDUINO)
   regtype *_pinDC, *_pinCS, *_pinCLK, *_pinMOSI, *_pinMISO, *_pinIrq;
   regsize _bitmaskDC, _bitmaskCS, _bitmaskCLK, _bitmaskMOSI, _bitmaskMISO, _bitmaskIrq;
@@ -57,7 +71,6 @@ private:
   DigitalIn *_pinIrq;
   SPI *_spi;
 #endif
-
 };
 #endif
 

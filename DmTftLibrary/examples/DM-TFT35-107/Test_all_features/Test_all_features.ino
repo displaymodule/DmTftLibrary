@@ -9,6 +9,7 @@
  THIS SOFTWARE IS SUPPLIED "AS IS" WITHOUT ANY WARRANTIES AND SUPPORT. DISPLAYMODULE ASSUMES
  NO RESPONSIBILITY OR LIABILITY FOR THE USE OF THE SOFTWARE.
  ********************************************************************************************/
+// Copy flashlog.bmp and sdlogo.bmp to the SD-card
 
 #include <SPI.h>
 #include <SPIFlash.h> // SPIFlash library from lowpowerlab (https://github.com/LowPowerLab/SPIFlash)
@@ -18,6 +19,7 @@
 #include <DmTouch.h>
 #include <DmDrawBmpFromSpiFlash.h>
 #include <DmDrawBmpFromSdCard.h>
+#include <utility/DmTouchCalibration.h>
 
 #define TFT_CS  10
 #define SD_CS   8
@@ -25,11 +27,11 @@
 #define T_CS    4
 #define T_IRQ   3
 
-DmTftSsd2119 tft = DmTftSsd2119(10, 9);
-//DmTftIli9341 tft = DmTftIli9341(10, 9);
+DmTftSsd2119 tft = DmTftSsd2119();
 DmDrawBmpFromSpiFlash spiFlashImage = DmDrawBmpFromSpiFlash();
 DmDrawBmpFromSdCard sdCardImage = DmDrawBmpFromSdCard();
-DmTouch dmTouch = DmTouch(DmTouch::DM_TFT35_107, T_CS, T_IRQ);
+DmTouch dmTouch = DmTouch(DmTouch::DM_TFT35_107);
+DmTouchCalibration calibration = DmTouchCalibration(&tft, &dmTouch);
 
 SPIFlash spiFlash(F_CS, 0xEF40);
 uint16_t textRow = 20;
@@ -46,8 +48,6 @@ void setup() {
   digitalWrite(T_CS, HIGH);
   
   Serial.begin(9600);
-
-  //Debug info
   Serial.print(F("Free RAM is: "));
   Serial.println(freeRam());
   
@@ -55,6 +55,7 @@ void setup() {
   tft.init();
   Serial.println(F("Init Touch drivers"));
   dmTouch.init();
+  dmTouch.setCalibrationMatrix(calibration.getDefaultCalibrationData((int)DmTouch::DM_TFT35_107));
   
   tft.drawString(35, 10, "www.displaymodule.com");
 
@@ -71,7 +72,6 @@ void setup() {
   }
   PrintTestResult("OK");
   
-  
   PrintTestName("Check Ext. Flash ");
   if (!spiFlash.initialize()) {
     PrintTestResult("Fail");
@@ -79,11 +79,9 @@ void setup() {
   }
   PrintTestResult("OK");
   
-  
   PrintTestName("Erase Flash ");
   eraseFlash(spiFlash);
   PrintTestResult("OK");
-  
   
   PrintTestName("Write bmp to ext. flash");
   if (!writeFileToFlash(0, spiFlash, "flashlog.bmp")) {
@@ -92,17 +90,14 @@ void setup() {
   }
   PrintTestResult("OK");
   
-  
   PrintTestName("Draw bmp ext. Flash");
   spiFlashImage.drawImage(0, spiFlash, tft, 0, 200);
   PrintTestResult("OK");
  
- 
   PrintTestName("Draw bmp SD-card");
-  sdCardImage.drawImage("sdlogo.bmp", tft, 0, 230);
+  sdCardImage.drawImage("sdlogo.bmp", tft, 181, 200);
   PrintTestResult("OK");
   
-  // Start Touch screen tests
   tft.drawString(15,280,"Tap screen to continue!");
   WaitForSquareToBePressed(0,0,240,320);
   tft.clearScreen();
@@ -111,25 +106,12 @@ void setup() {
   tft.drawString(36,36,"www.displaymodule.com");
   tft.drawString(24,56,"Press the colored squares");
   
-  tft.fillRectangle(40, 100, 80, 140, BLUE);
-  WaitForSquareToBePressed(40,100,40,40);
-  tft.fillRectangle(40, 100, 80, 140, BLACK);
-  
-  tft.fillRectangle(160, 100, 200, 140, RED);
-  WaitForSquareToBePressed(160,100,40,40);
-  tft.fillRectangle(160, 100, 200, 140, BLACK);
-  
-  tft.fillRectangle(40, 220, 80, 260, GREEN);
-  WaitForSquareToBePressed(40,220,40,40);
-  tft.fillRectangle(40, 220, 80, 260, BLACK);
-  
-  tft.fillRectangle(160, 220, 200, 260, YELLOW);
-  WaitForSquareToBePressed(160,220,40,40);
-  tft.fillRectangle(40, 100, 80, 140, BLUE);
-  tft.fillRectangle(40, 220, 80, 260, GREEN);
-  tft.fillRectangle(160, 100, 200, 140, RED);
-  
-  tft.drawString(26,290,"All features tested!");
+  pressSquare(80, 80, 120, 120, BLUE);
+  pressSquare(160, 80, 200, 120, RED);
+  pressSquare(80, 150, 120, 190, GREEN);
+  pressSquare(160, 150, 200, 190, YELLOW);
+   
+  tft.drawString(26,200,"All features tested!");
   while(1){}
 }
 
@@ -163,7 +145,15 @@ boolean writeFileToFlash(uint32_t startAddress, SPIFlash spiFlash, char* fileNam
   return true;
 }
 
-void WaitForSquareToBePressed(int x, int y, int width, int length) {
+void pressSquare(int x1, int y1, int x2, int y2, uint16_t color) {
+  tft.fillRectangle(x1, y1, x2, y2, color);
+  WaitForSquareToBePressed(x1 ,y1 ,x2 ,y2);
+  tft.fillRectangle(x1, y1, x2, y2, BLACK);
+}
+
+void WaitForSquareToBePressed(int x1, int y1, int x2, int y2) {
+  int width = x2 - x1;
+  int length = y2 - y1;
   uint8_t squarePressed = 0;
   bool touched;
   uint16_t posX, posY;
@@ -171,13 +161,12 @@ void WaitForSquareToBePressed(int x, int y, int width, int length) {
   while (!squarePressed) {
     if (dmTouch.isTouched()) {
       dmTouch.readTouchData(posX, posY, touched);
-      if (posX >= x && posX <= x+width && posY >= y && posY <= y+length) {
+      if (posX >= x1 && posX <= x1+width && posY >= y1 && posY <= y1+length) {
         squarePressed = 1;
       }
     }
   }
 }
-
 
 void PrintTestName(char* text) {
   textRow += 20;

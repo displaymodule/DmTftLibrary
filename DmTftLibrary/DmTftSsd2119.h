@@ -19,7 +19,7 @@ class DmTftSsd2119 : public DmTftBase
 {
 public:
 #if defined (__AVR__)
-  DmTftSsd2119(uint8_t cs, uint8_t dc);
+  DmTftSsd2119(uint8_t cs=D10, uint8_t dc=D9);
 #elif defined (TOOLCHAIN_ARM_MICRO)
   DmTftSsd2119(uint8_t cs=D10, uint8_t dc=D9, uint8_t miso=D12, uint8_t mosi=D11, uint8_t clk=D13);
 #endif

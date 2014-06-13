@@ -12,32 +12,13 @@
 // Tested with Xpt2046
 
 #include "DmTouch.h"
+#define MEASUREMENTS 10
 
-#if defined(DM_TOOLCHAIN_ARDUINO)
 // disp        - which display is used
-// cs          - pin number CS (Chip Select, SS)
-// tIrq        - pin number IRQ (set to -1 if you don't want to use)
-// hardwareSpi - set to 1 if you want to use hardware Spi, 0 otherwise
-//               (note, if you use hardware Spi on arduino, clk, mosi and miso will be disregarded)
-// clk         - pin number CLK (SLK)
-// mosi        - pin number MOSI
-// miso        - pin number MISO
-// width       - width of display (default 240)
-// height      - height of display (default 320)
-DmTouch::DmTouch(Display disp, uint8_t cs, int8_t tIrq, int8_t hardwareSpi, uint8_t clk, uint8_t mosi, uint8_t miso, uint16_t width, uint16_t height) : _width(width), _height(height)
+// spiMode     - How to read SPI-data, Software, Hardware or Auto
+// useIrq      - Enable IRQ or disable IRQ
+DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
 {
-  _hardwareSpi = hardwareSpi;
-  _cs = cs;
-  _irq = tIrq;
-  _clk = clk;
-  _mosi = mosi;
-  _miso = miso;
-
-#elif defined (DM_TOOLCHAIN_MBED)
-// disp        - which display is used
-DmTouch::DmTouch(Display disp, bool hardwareSPI)
-{
-  _hardwareSpi = hardwareSPI;
   switch (disp) {
     // Display with 40-pin connector on top of adapter board
     case DmTouch::DM_TFT28_103:
@@ -47,8 +28,7 @@ DmTouch::DmTouch(Display disp, bool hardwareSPI)
       _clk = A1;
       _mosi = A0;
       _miso = D9;
-      _width = 240;
-      _height = 320;
+	  _hardwareSpi = false;
       break;
     
     case DmTouch::DM_TFT28_105:
@@ -57,8 +37,7 @@ DmTouch::DmTouch(Display disp, bool hardwareSPI)
       _clk = D13;
       _mosi = D11;
       _miso = D12;
-      _width = 240;
-      _height = 320;
+	  _hardwareSpi = true;
       break;
 
     case DmTouch::DM_TFT35_107:
@@ -68,47 +47,21 @@ DmTouch::DmTouch(Display disp, bool hardwareSPI)
       _clk = D13;
       _mosi = D11;
       _miso = D12;
-      _width = 320;
-      _height = 240;
+	  _hardwareSpi = true;
       break;
   }
-#endif
-
-  // Calibration data for the different displays
-  switch (disp) {
-    case DmTouch::DM_TFT28_103:
-      _calibLowX = 220;
-      _calibLowY = 220;
-      _calibModifierX = 15.25;
-      _calibModifierY = 11.16;
-      _calibInvertedTouch = false;
-      break;
-
-    case DmTouch::DM_TFT24_104:
-      _calibLowX = 210;
-      _calibLowY = 280;
-      _calibModifierX = 15;
-      _calibModifierY = 11.24;
-      _calibInvertedTouch = true;
-      break;
-
-	case DmTouch::DM_TFT35_107:
-      _calibLowX = 912;
-      _calibLowY = 422 ;
-      _calibModifierX = 3.25;
-      _calibModifierY = 1.175;
-      _calibInvertedTouch = false;
-	  break;
-	  
-    case DmTouch::DM_TFT28_105:
-    default:
-      _calibLowX = 260;
-      _calibLowY = 220;
-      _calibModifierX = 14.42;
-      _calibModifierY = 10.78;
-      _calibInvertedTouch = false;
-      break;
+  
+  if (spiMode == DmTouch::Hardware) {
+	_hardwareSpi = true;
+  } else if (spiMode == DmTouch::Software) {
+	_hardwareSpi = false;
   }
+  
+  if (!useIrq) {
+	_irq = -1;
+  }
+
+  _samplesPerMeasurement = 3;
 }
 
 void DmTouch::init() {
@@ -119,7 +72,7 @@ void DmTouch::init() {
 
   if (_hardwareSpi) {
     SPI.begin();
-    SPI.setClockDivider(SPI_CLOCK_DIV2);
+    SPI.setClockDivider(SPI_CLOCK_DIV32);
     SPI.setBitOrder(MSBFIRST);
     SPI.setDataMode(SPI_MODE0);
     _spiSettings = SPCR;
@@ -171,39 +124,20 @@ void DmTouch::enableIrq() {
 }
 
 void DmTouch::spiWrite(uint8_t data) {
-#if defined (DM_TOOLCHAIN_ARDUINO)
   if (_hardwareSpi) {
+#if defined (DM_TOOLCHAIN_ARDUINO)
     SPCR = _spiSettings;   // SPI Control Register
     SPDR = data;        // SPI Data Register
     while(!(SPSR & _BV(SPIF)));  // SPI Status Register Wait for transmission to finish
-  }
-  else {
-    uint8_t count=0;
-    uint8_t temp;
-    unsigned nop;
-    temp=data; // really needed?
-    cbi(_pinCLK, _bitmaskCLK);
-    for(count=0;count<8;count++) {
-      if(temp&0x80) {
-        sbi(_pinMOSI, _bitmaskMOSI);
-      }
-      else {
-        cbi(_pinMOSI, _bitmaskMOSI);
-      }
-
-      temp=temp<<1;
-
-      pulse_low(_pinCLK, _bitmaskCLK);
-    }
-  }
 #elif defined (DM_TOOLCHAIN_MBED)
-  if (_hardwareSpi) {
     _spi->write(data);
+#endif
   }
   else {
     uint8_t count=0;
     uint8_t temp = data;
-    cbi(_pinCLK, _bitmaskCLK);
+    delay(1);
+	cbi(_pinCLK, _bitmaskCLK);
     for(count=0;count<8;count++) {
       if(temp&0x80) {
         sbi(_pinMOSI, _bitmaskMOSI);
@@ -217,7 +151,6 @@ void DmTouch::spiWrite(uint8_t data) {
       pulse_low(_pinCLK, _bitmaskCLK);
     }
   }
-#endif
 }
 
 uint8_t DmTouch::spiRead() {// Only used for Hardware SPI
@@ -237,7 +170,6 @@ uint8_t DmTouch::spiRead() {// Only used for Hardware SPI
     cbi(_pinCLK, _bitmaskCLK);
     cbi(_pinMOSI, _bitmaskMOSI);
     for(count=0;count<8;count++) {
-
       pulse_low(_pinCLK, _bitmaskCLK);
       temp = temp<<1;
       temp |= _pinMISO->read();
@@ -252,18 +184,20 @@ uint16_t DmTouch::readData12(uint8_t command) {
   uint16_t value = 0;
 
   spiWrite(command); // Send command
-//--------------
+  delayMicroseconds(10); // Test
+
 #if defined (DM_TOOLCHAIN_ARDUINO)
   if (_hardwareSpi) {
     // We use 7-bits from the first byte and 5-bit from the second byte
     temp = spiRead();
+
     value = temp<<8;
     temp = spiRead();
-    value |= temp;
+
+	value |= temp;
     value >>=3;
     value &= 0xFFF;
-  }
-  else {
+  } else {
     pulse_high(_pinCLK, _bitmaskCLK);
     unsigned nop;
     uint8_t count=0;
@@ -287,52 +221,41 @@ uint16_t DmTouch::readData12(uint8_t command) {
   return value;
 }
 
+void DmTouch::readRawData(uint16_t &x, uint16_t &y) {
+  cbi(_pinCS, _bitmaskCS);
+  x = readData12(0xD0);
+  y = readData12(0x90);
+  sbi(_pinCS, _bitmaskCS);
+}
+
 void DmTouch::readTouchData(uint16_t& posX, uint16_t& posY, bool& touching) {
 #if defined (DM_TOOLCHAIN_MBED)
   if (!isTouched()) {
     touching = false;
     return;
   }
-  //touching = true;
 #endif
-  unsigned int TP_X, TP_Y;
-  cbi(_pinCS, _bitmaskCS);
+  uint16_t touchX, touchY;
+  getMiddleXY(touchX,touchY);  
 
-  TP_X = readData12(0xD0);
-  TP_Y = readData12(0x90);
-
-  sbi(_pinCS, _bitmaskCS);
-
-//  Serial.print("Raw X: ");
-//  Serial.println(TP_X);
-//  Serial.print("Raw Y: ");
-//  Serial.println(TP_Y);
-
-  // Convert raw data to screen positions
-  if (_calibInvertedTouch) {
-    posX=_width-((TP_X-_calibLowX)/_calibModifierX);
-    posY=_height-((TP_Y-_calibLowY)/_calibModifierY);
-  } else {
-    posX=((TP_X-_calibLowX)/_calibModifierX);
-    posY=((TP_Y-_calibLowY)/_calibModifierY);
-  }
-
-//#if defined (DM_TOOLCHAIN_ARDUINO)
-  if (posX >= 0 && posX <= _width && posY >= 0 && posY <= _height) {
-    touching = true;
-  } else {
-    touching = false;
-  }
-//#endif
+  posX = getDisplayCoordinateX(touchX, touchY);
+  posY = getDisplayCoordinateY(touchX, touchY);
 }
 
-uint8_t DmTouch::isTouched() {
+bool DmTouch::isSampleValid() {
+  uint16_t sampleX,sampleY;
+  readRawData(sampleX,sampleY);
+  if (sampleX > 0 && sampleX < 4095 && sampleY > 0 && sampleY < 4095) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool DmTouch::isTouched() {
 #if defined (DM_TOOLCHAIN_ARDUINO)
   if (_irq == -1) {
-    uint16_t posX, posY;
-    bool touched;
-    readTouchData(posX, posY, touched);
-    return touched;
+    return isSampleValid();
   }
 
   if ( !gbi(_pinIrq, _bitmaskIrq) ) {
@@ -343,6 +266,101 @@ uint8_t DmTouch::isTouched() {
 #elif defined (DM_TOOLCHAIN_MBED)
   return (*_pinIrq == 0);
 #endif
+}
+
+bool DmTouch::getMiddleXY(uint16_t &x, uint16_t &y) {
+  bool haveAllMeasurements  = true;
+  uint16_t valuesX[MEASUREMENTS];
+  uint16_t valuesY[MEASUREMENTS];
+  uint8_t nbrOfMeasurements = 0;
+   
+  for (int i=0; i<MEASUREMENTS; i++) {
+    getAverageXY(valuesX[i], valuesY[i]);
+    nbrOfMeasurements++;
+    if (!isTouched()) {
+      haveAllMeasurements = false;
+      break;
+    }
+  }
+  x = calculateMiddleValue(valuesX, nbrOfMeasurements);
+  y = calculateMiddleValue(valuesY, nbrOfMeasurements);
+   
+  return haveAllMeasurements;
+}
+
+void DmTouch::getAverageXY(uint16_t &x, uint16_t &y) {
+  uint32_t sumX = 0;
+  uint32_t sumY = 0;
+  uint16_t sampleX,sampleY;
+  readRawData(sampleX,sampleY);
+
+  for (int i=0; i<_samplesPerMeasurement; i++) {
+	readRawData(sampleX,sampleY);
+    sumX += sampleX;
+    sumY += sampleY;
+  }
+
+  x = (uint32_t)sumX/_samplesPerMeasurement;
+  y = (uint32_t)sumY/_samplesPerMeasurement;
+}
+
+// Total number of samples = MEASUREMENTS * _samplesPerMeasurement
+void DmTouch::setPrecison(uint8_t samplesPerMeasurement) {
+  _samplesPerMeasurement = samplesPerMeasurement;
+}
+
+void DmTouch::setCalibrationMatrix(CalibrationMatrix calibrationMatrix) {
+  _calibrationMatrix = calibrationMatrix;
+}
+
+void DmTouch::waitForTouch() {
+  while(!isTouched()) {}
+}
+
+void DmTouch::waitForTouchRelease() {
+  while(isTouched()) {}
+}
+
+uint16_t DmTouch::getDisplayCoordinateX(uint16_t x_touch, uint16_t y_touch) {
+  uint16_t Xd;
+  float temp;
+  temp = (_calibrationMatrix.a * x_touch + _calibrationMatrix.b * y_touch + _calibrationMatrix.c) / rescaleFactor();
+  Xd = (uint16_t)(temp);
+  if (Xd > 60000) {
+    Xd = 0;
+  }
+  return Xd;
+}
+
+uint16_t DmTouch::getDisplayCoordinateY(uint16_t x_touch, uint16_t y_touch) {
+  uint16_t Yd;
+  float temp;
+  temp = (_calibrationMatrix.d * x_touch + _calibrationMatrix.e * y_touch + _calibrationMatrix.f) / rescaleFactor();
+  Yd = (uint16_t)(temp);
+  if (Yd > 60000) {
+    Yd = 0;
+  }
+  return Yd;
+}
+
+uint16_t DmTouch::calculateMiddleValue(uint16_t values[], uint8_t count) {
+  uint16_t temp;
+
+  for(uint8_t i=0; i<count-1; i++) {
+    for(uint8_t j=i+1; j<count; j++) {
+      if(values[j] < values[i]) {
+        temp = values[i];
+        values[i] = values[j];
+        values[j] = temp;
+      }
+    }
+  }
+
+  if(count%2==0) {
+    return((values[count/2] + values[count/2 - 1]) / 2.0);
+  } else {
+    return values[count/2];
+  }
 }
 
 

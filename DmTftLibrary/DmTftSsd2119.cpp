@@ -49,30 +49,24 @@ void DmTftSsd2119::writeBus(uint8_t data) {
 }
 
 void DmTftSsd2119::sendCommand(uint8_t index) {
-  // cbi(_pinCS, _bitmaskCS);
   cbi(_pinDC, _bitmaskDC);
 
-  writeBus(0x00); // Temp
+  writeBus(0x00);
   writeBus(index);
-  // sbi(_pinCS, _bitmaskCS);
 }
 
 void DmTftSsd2119::send8BitData(uint8_t data) {
-  //cbi(_pinCS, _bitmaskCS);
   sbi(_pinDC, _bitmaskDC);
   writeBus(data);
-  //sbi(_pinCS, _bitmaskCS);
 }
 
 void DmTftSsd2119::sendData(uint16_t data) {
   uint8_t dh = data>>8;
   uint8_t dl = data&0xff;
 
-  //cbi(_pinCS, _bitmaskCS);
   sbi(_pinDC, _bitmaskDC);
   writeBus(dh);
   writeBus(dl);
-  //sbi(_pinCS, _bitmaskCS);
 }
 
 void DmTftSsd2119::setAddress(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
@@ -114,8 +108,6 @@ void DmTftSsd2119::setPixel(uint16_t x, uint16_t y, uint16_t color) {
   
   sbi(_pinCS, _bitmaskCS);
 }
-
-
 
 void DmTftSsd2119::init(void) {
   setTextColor(BLACK, WHITE);
@@ -180,19 +172,19 @@ void DmTftSsd2119::init(void) {
   sendCommand(0X0B);    // Frame Cycle Control.
   sendData(0x5308);     // SET NO SDT=1 clock cycle (POR) ,Sets the equalizing period,    
 
-  sendCommand(0x0C);    // Power Control 2 设VCIX2 电压
+  sendCommand(0x0C);    // Power Control 2 VCIX2
   sendData(0x0003);     // Adjust VCIX2 output voltage=5.7V
 
   sendCommand(0x0D);    // Set amplitude magnification of VLCD63     
   sendData(0x000A);     // vlcd63=VREF(2.0V)* 2.335V
 
-  sendCommand(0x0E);    // SET VCOMG VDV .设VCOM电压
+  sendCommand(0x0E);    // SET VCOMG VDV .VCOM
   sendData(0x2B00);     // SET VCOMG=1,VCOM=VLCD63*  //2A 
 
   sendCommand(0X0F);    // Gate Scan Position.
   sendData(0x0000);     // The valid range is from 1 to 240.   
 
-  sendCommand(0x1E);    // SET nOTP VCOMH ,设VCOMH电压
+  sendCommand(0x1E);    // SET nOTP VCOMH ,VCOMH
   sendData(0x00B7);     // SET nOTP=0, VCOMH=VLCD63* //B8
 
   sendCommand(0x25);    // Frame Frequency Control
@@ -204,9 +196,8 @@ void DmTftSsd2119::init(void) {
   sendCommand(0x27);    // Analog setting
   sendData(0x0078);
 
-  //
-  sendCommand(0x12);    // Sleep mode
-  sendData(0xD999);   
+//  sendCommand(0x12);    // Sleep mode
+//  sendData(0xD999);   
 
   // SET WINDOW
   sendCommand(0x4E);    // Ram Address Set
