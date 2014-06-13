@@ -19,7 +19,7 @@ class DmTftIli9341 : public DmTftBase
 {
 public:
 #if defined (DM_TOOLCHAIN_ARDUINO)
-  DmTftIli9341(uint8_t cs, uint8_t dc);
+  DmTftIli9341(uint8_t cs=D10, uint8_t dc=D9);
 #elif defined (DM_TOOLCHAIN_MBED)
   DmTftIli9341(uint8_t cs=D10, uint8_t dc=D9, uint8_t miso=D12, uint8_t mosi=D11, uint8_t clk=D13);
 #endif

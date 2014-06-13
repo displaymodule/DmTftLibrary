@@ -32,6 +32,10 @@ extern uint8_t font[];
 
 void DmTftBase::setPixel(uint16_t x, uint16_t y, uint16_t color) {
   cbi(_pinCS, _bitmaskCS);
+  
+  if (x>(_width-1) || x< 0 || y>(_height-1) || y< 0) {
+    return;
+  }
 
   setAddress(x, y, x, y);
 
@@ -83,6 +87,7 @@ void DmTftBase::drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uin
   int dx = abs(x), sx = x0<x1 ? 1 : -1;
   int dy = -abs(y), sy = y0<y1 ? 1 : -1;
   int err = dx+dy, e2;  /* error value e_xy             */
+  
   for (;;) {
     setPixel(x0,y0,color);
     e2 = 2*err;

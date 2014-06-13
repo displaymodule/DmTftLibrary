@@ -189,7 +189,7 @@ void DmTftIli9325::init(void) {
   sendCommand(0x98); sendData(0x0000);
   sendCommand(0x07); sendData(0x0133);
   sbi(_pinCS, _bitmaskCS);
-
+  delay(500);
   clearScreen();
 }
 

@@ -17,6 +17,7 @@
 #include <DmTouch.h>
 #include <DmDrawBmpFromSpiFlash.h>
 #include <DmDrawBmpFromSdCard.h>
+#include <utility/DmTouchCalibration.h>
 
 #define TFT_CS  10
 #define SD_CS   8
@@ -24,10 +25,11 @@
 #define T_CS    4
 #define T_IRQ   3
 
-DmTftIli9341 tft = DmTftIli9341(10, 9);
+DmTftIli9341 tft = DmTftIli9341();
 DmDrawBmpFromSpiFlash spiFlashImage = DmDrawBmpFromSpiFlash();
 DmDrawBmpFromSdCard sdCardImage = DmDrawBmpFromSdCard();
-DmTouch dmTouch = DmTouch(DmTouch::DM_TFT28_105, T_CS, T_IRQ);
+DmTouch dmTouch = DmTouch(DmTouch::DM_TFT28_105);
+DmTouchCalibration calibration = DmTouchCalibration(&tft, &dmTouch);
 
 SPIFlash spiFlash(F_CS, 0xEF40);
 uint16_t textRow = 20;
@@ -44,8 +46,7 @@ void setup() {
   digitalWrite(T_CS, HIGH);
   
   Serial.begin(9600);
-
-  //Debug info
+  
   Serial.print(F("Free RAM is: "));
   Serial.println(freeRam());
   
@@ -53,7 +54,7 @@ void setup() {
   tft.init();
   Serial.println(F("Init Touch drivers"));
   dmTouch.init();
-  
+  dmTouch.setCalibrationMatrix(calibration.getDefaultCalibrationData((int)DmTouch::DM_TFT28_105));  
   
   tft.drawString(35, 10, "www.displaymodule.com");
   
