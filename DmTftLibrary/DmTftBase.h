@@ -37,7 +37,9 @@ public:
 
   uint16_t width() { return _width; }
   uint16_t height() { return _height; }
-
+  void setWidth(uint16_t width) {  _width = width; }
+  void setHeight(uint16_t height) {  _height = height; }
+  
   void setTextColor(uint16_t background, uint16_t foreground) { _bgColor = background; _fgColor = foreground; }
 
   virtual void setPixel(uint16_t x, uint16_t y, uint16_t color);
@@ -69,6 +71,7 @@ public:
   
   void select();
   void unSelect();
+
 protected:
   virtual void sendCommand(uint8_t index) = 0;
 
@@ -80,9 +83,10 @@ protected:
   uint8_t _bitmaskCS;
 #endif
 
+	uint16_t _width;
+  uint16_t _height;
+	
 private:
-  const uint16_t _width;
-  const uint16_t _height;
 
   uint16_t _bgColor;
   uint16_t _fgColor;
