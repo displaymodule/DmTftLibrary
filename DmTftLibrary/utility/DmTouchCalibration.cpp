@@ -56,6 +56,27 @@ CalibrationMatrix DmTouchCalibration::getDefaultCalibrationData(int disp) {
       calibrationMatrix.d = -439;
       calibrationMatrix.e = 89201;
       calibrationMatrix.f = -10450920;
+			break;
+			
+		case DmTouch::DM_TFT43_108: 
+			if(_tft->width() == 480){
+      	calibrationMatrix.a = 541307;
+      	calibrationMatrix.b = -4288;
+      	calibrationMatrix.c = -36678732;
+      	calibrationMatrix.d = 2730;
+      	calibrationMatrix.e = 321714;
+      	calibrationMatrix.f = -31439472;	
+			}
+			else if(_tft->width() == 800){
+      	calibrationMatrix.a = 871837;
+      	calibrationMatrix.b = 7273;
+      	calibrationMatrix.c = -57891280;
+      	calibrationMatrix.d = -5861;
+      	calibrationMatrix.e = 536190;
+      	calibrationMatrix.f = -39840708;					
+			}
+			break;
+			
     default:
       break;
   }
@@ -78,9 +99,26 @@ bool DmTouchCalibration::getTouchReferencePoints(Point displayRefPoint[], Point 
 
   for(int n;n<5;n++) {
     drawCalibPoint(displayRefPoint[n].x, displayRefPoint[n].y);
-    if (!getRawTouch(touchRefPoint[n].x, touchRefPoint[n].y))
-      return false;
-    releaseTouch(displayRefPoint[n].x, displayRefPoint[n].y);
+		if(_touch->_touch_id == DmTouch::IC_8875){  // RA8875 
+			// Clear any previous interrupts to avoid false buffered reads 
+			uint16_t x, y;
+			_touch->readRawData(x, y);
+			// Wait around for a new touch event (INT pin goes low) 
+			while (digitalRead(_touch->_irq))
+			{
+			}
+			// Make sure this is really a touch event 
+			if (_touch->isTouched()){
+					_touch->readRawData(touchRefPoint[n].x, touchRefPoint[n].y);
+			}
+
+			releaseTouch(displayRefPoint[n].x, displayRefPoint[n].y);			
+		}
+		else{
+    	if (!getRawTouch(touchRefPoint[n].x, touchRefPoint[n].y))
+      	return false;
+    	releaseTouch(displayRefPoint[n].x, displayRefPoint[n].y);
+		}
   }
   
   _touch->setPrecison(3);
@@ -90,11 +128,10 @@ bool DmTouchCalibration::getTouchReferencePoints(Point displayRefPoint[], Point 
 bool DmTouchCalibration::getRawTouch(uint16_t& x, uint16_t& y) {
   bool touched = false;
   bool hasAllSamples = false;
-    
   while(!touched) {
     if (_touch->isTouched()) {
       Serial.println("is touched");
-      hasAllSamples = _touch->getMiddleXY(x, y);
+      hasAllSamples = _touch->getMiddleXY(x, y);			
       touched = true; 
     }
   }
@@ -114,7 +151,10 @@ void DmTouchCalibration::releaseTouch(uint16_t x, uint16_t y) {
   delay(100);
   _tft->fillCircle(x, y, 10, BLACK);
   delay(300);
-  _touch->waitForTouchRelease();
+	if(_touch->_touch_id != DmTouch::IC_8875){
+		_touch->waitForTouchRelease();
+	}
+
 }
 
 CalibrationMatrix DmTouchCalibration::calculateCalibrationMatrix(Point displayRefPoint[], Point touchRefPoint[]) {
