@@ -9,7 +9,7 @@
  THIS SOFTWARE IS SUPPLIED "AS IS" WITHOUT ANY WARRANTIES AND SUPPORT. DISPLAYMODULE ASSUMES
  NO RESPONSIBILITY OR LIABILITY FOR THE USE OF THE SOFTWARE.
  ********************************************************************************************/
-// Tested with Xpt2046
+// Tested with Xpt2046 or Ra8875
 
 #include "DmTouch.h"
 #define MEASUREMENTS 10
@@ -29,6 +29,7 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
       _mosi = A0;
       _miso = D9;
 	  _hardwareSpi = false;
+		_touch_id = IC_2046;
       break;
     
     case DmTouch::DM_TFT28_105:
@@ -38,9 +39,29 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
       _mosi = D11;
       _miso = D12;
 	  _hardwareSpi = true;
+		_touch_id = IC_2046;
       break;
 
     case DmTouch::DM_TFT35_107:
+      _cs = D4;
+      _irq = D2;
+      _clk = D13;
+      _mosi = D11;
+      _miso = D12;
+	  _hardwareSpi = true;
+		_touch_id = IC_2046;
+			break;
+
+    case DmTouch::DM_TFT43_108:
+      _cs = D10;
+      _irq = D2;
+      _clk = D13;
+      _mosi = D11;
+      _miso = D12;
+	  _hardwareSpi = true;
+		_touch_id = IC_8875;
+			break;
+			
     default:
       _cs = D4;
       _irq = D2;
@@ -48,6 +69,7 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
       _mosi = D11;
       _miso = D12;
 	  _hardwareSpi = true;
+		_touch_id = IC_2046;
       break;
   }
   
@@ -55,8 +77,7 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
 	_hardwareSpi = true;
   } else if (spiMode == DmTouch::Software) {
 	_hardwareSpi = false;
-  }
-  
+  }  
   if (!useIrq) {
 	_irq = -1;
   }
@@ -111,6 +132,7 @@ void DmTouch::init() {
 void DmTouch::enableIrq() {
 #if defined (DM_TOOLCHAIN_ARDUINO)
   pinMode(_irq, INPUT);
+	digitalWrite(_irq, HIGH);
   _pinIrq = portInputRegister(digitalPinToPort(_irq));
   _bitmaskIrq  = digitalPinToBitMask(_irq);
 #elif defined (DM_TOOLCHAIN_MBED)
@@ -119,9 +141,54 @@ void DmTouch::enableIrq() {
 #endif
 
   cbi(_pinCS, _bitmaskCS);
-  spiWrite(0x80); // Enable PENIRQ
+	if(_touch_id == IC_8875){
+		// enable touch panel
+		writeCommand(0x70);
+		writeData(0xB3);
+
+		// set auto mode
+		writeCommand(0x71);
+		writeData(0x04);
+
+		// enable touch panel interrupt
+		uint8_t temp;
+		writeCommand(0xF0);
+		temp = readData();		
+		writeCommand(0xF0);
+		writeData(temp | 0x04);
+	}
+	else{
+  	spiWrite(0x80); // Enable PENIRQ
+	}
   sbi(_pinCS, _bitmaskCS);
 }
+
+/************  Add for Ra8875 ****************/
+void  DmTouch::writeData(uint8_t d) 
+{
+  cbi(_pinCS, _bitmaskCS);
+  spiWrite(0x00);
+  spiWrite(d);
+  sbi(_pinCS, _bitmaskCS);
+}
+
+uint8_t  DmTouch::readData(void) 
+{
+ cbi(_pinCS, _bitmaskCS);
+  spiWrite(0x40);
+  uint8_t x = spiRead();
+  sbi(_pinCS, _bitmaskCS);
+  return x;
+}
+
+void  DmTouch::writeCommand(uint8_t d) 
+{
+  cbi(_pinCS, _bitmaskCS);
+  spiWrite(0x80);
+  spiWrite(d);
+  sbi(_pinCS, _bitmaskCS);
+}
+/*************************************/
 
 void DmTouch::spiWrite(uint8_t data) {
   if (_hardwareSpi) {
@@ -137,7 +204,7 @@ void DmTouch::spiWrite(uint8_t data) {
     uint8_t count=0;
     uint8_t temp = data;
     delay(1);
-	cbi(_pinCLK, _bitmaskCLK);
+		cbi(_pinCLK, _bitmaskCLK);
     for(count=0;count<8;count++) {
       if(temp&0x80) {
         sbi(_pinMOSI, _bitmaskMOSI);
@@ -178,6 +245,7 @@ uint8_t DmTouch::spiRead() {// Only used for Hardware SPI
   }
 #endif
 }
+
 
 uint16_t DmTouch::readData12(uint8_t command) {
   uint8_t temp = 0;
@@ -223,8 +291,34 @@ uint16_t DmTouch::readData12(uint8_t command) {
 
 void DmTouch::readRawData(uint16_t &x, uint16_t &y) {
   cbi(_pinCS, _bitmaskCS);
-  x = readData12(0xD0);
-  y = readData12(0x90);
+		if(_touch_id == IC_8875){
+			uint16_t tx, ty;
+			uint8_t temp;
+
+			writeCommand(0x72);
+		  tx = readData();			
+			writeCommand(0x73);
+		  ty = readData();			
+			writeCommand(0x74);
+		  temp = readData();
+			
+			tx <<= 2;
+			ty <<= 2;
+			tx |= temp & 0x03;				// get the bottom x bits
+			ty |= (temp >> 2) & 0x03; // get the bottom y bits
+			
+			x = tx;
+			y = ty;
+			
+			// Clear TP INT Status 
+			writeCommand(0xF1);
+			writeData(0x04);
+			
+		}
+		else{
+  		x = readData12(0xD0);
+  		y = readData12(0x90);
+		}
   sbi(_pinCS, _bitmaskCS);
 }
 
@@ -236,7 +330,7 @@ void DmTouch::readTouchData(uint16_t& posX, uint16_t& posY, bool& touching) {
   }
 #endif
   uint16_t touchX, touchY;
-  getMiddleXY(touchX,touchY);  
+  getMiddleXY(touchX,touchY); 
 
   posX = getDisplayCoordinateX(touchX, touchY);
   posY = getDisplayCoordinateY(touchX, touchY);
@@ -254,13 +348,22 @@ bool DmTouch::isSampleValid() {
 
 bool DmTouch::isTouched() {
 #if defined (DM_TOOLCHAIN_ARDUINO)
-  if (_irq == -1) {
-    return isSampleValid();
-  }
+  if(_touch_id == IC_8875){
+		uint8_t temp;
+		writeCommand(0xF1);
+		temp = readData();
+		if(temp & 0x04)return true;
+		return false;		
+	}
+	else {
+  	if (_irq == -1) {
+ 			return isSampleValid();
+  	}
 
-  if ( !gbi(_pinIrq, _bitmaskIrq) ) {
-    return true;
-  }
+  	if ( !gbi(_pinIrq, _bitmaskIrq) ) {
+    	return true;
+  	}
+	}
 
   return false;
 #elif defined (DM_TOOLCHAIN_MBED)
@@ -318,7 +421,7 @@ void DmTouch::waitForTouch() {
 }
 
 void DmTouch::waitForTouchRelease() {
-  while(isTouched()) {}
+  	while(isTouched()) {}	
 }
 
 uint16_t DmTouch::getDisplayCoordinateX(uint16_t x_touch, uint16_t y_touch) {
