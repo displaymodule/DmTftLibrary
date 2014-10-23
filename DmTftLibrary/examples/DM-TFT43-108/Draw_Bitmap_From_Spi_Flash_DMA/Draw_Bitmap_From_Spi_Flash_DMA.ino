@@ -46,19 +46,28 @@ void setup()
   tft.backlightAdjust(255);   // default value max
   
   initFlash(spiFlash);
-  
+  tft.drawString(5, 0, "www.displaymodule.com");
   Serial.print(F("Initializing SD-card: "));
+  PrintTestName("Initializing SD-card: ");
   if (SD.begin(SD_CS)) {
     Serial.println(F("OK"));
-    // SD-card found, write from SD-card to flash memory
-    eraseFlash(spiFlash);
-    writeFileToFlash(0, spiFlash, "logol565.bin");
+    PrintTestResult("OK");
   }
   else
   {
     Serial.println(F("Fail"));
+    PrintTestResult("Fail");
   }
-  
+    // write from SD-card to flash memory
+    PrintTestName("Erase Flash ");
+    eraseFlash(spiFlash);
+    PrintTestResult("OK");
+    
+    PrintTestName("Write bmp to ext. flash");
+    writeFileToFlash(0, spiFlash, "logol565.bin");
+    PrintTestResult("OK");
+    
+    delay(1000);
   uint32_t startTime, endTime;
   
   startTime = millis();
@@ -81,6 +90,7 @@ void setup()
   Serial.println(" ms");
   
    // key test
+  textRow = 0;
   PrintTestName("Press a key to continue!");  
   tft.eableKeyScan(true);
   uint8_t key_value;
@@ -213,4 +223,9 @@ void PrintTestName(char* text) {
   }  
   tft.drawString(5, textRow, text);
   Serial.print(text);
+}
+void PrintTestResult(char* text) {
+  tft.drawString(200, textRow, text);
+  Serial.print(": ");
+  Serial.println(text);
 }
