@@ -46,9 +46,9 @@ void setup() {
   digitalWrite(F_CS, HIGH);
   digitalWrite(T_CS, HIGH);
   
-  Serial.begin(9600);
-  Serial.print(F("Free RAM is: "));
-  Serial.println(freeRam());
+  //Serial.begin(9600);
+  //Serial.print(F("Free RAM is: "));
+  //Serial.println(freeRam());
   
   Serial.println(F("Init TFT drivers"));
   // 'RA8875_480x272' or 'RA8875_800x480'
@@ -56,7 +56,7 @@ void setup() {
   // With hardware accelleration this is instant
   tft.clearScreen(BLACK);
   
-  Serial.println(F("Init Touch drivers"));
+  //Serial.println(F("Init Touch drivers"));
   dmTouch.init();
   dmTouch.setCalibrationMatrix(calibration.getDefaultCalibrationData((int)DmTouch::DM_TFT43_108));
 
@@ -82,12 +82,12 @@ void setup() {
   PrintTestName("Check bmp on SD-card");
   if (!SD.begin(SD_CS)) {
     PrintTestResult("Fail");
-    Serial.println("Failed to init SD-card");
+    //Serial.println("Failed to init SD-card");
     while(1);
   }
   if (!sdCardImage.printHeaderInfo("flashlog.bmp") || !sdCardImage.printHeaderInfo("sdlogo.bmp")) {
     PrintTestResult("Fail");
-    Serial.println("Can't find images on SD-card or the images are corrupt");
+    //Serial.println("Can't find images on SD-card or the images are corrupt");
     while(1);
   }
   PrintTestResult("OK");
@@ -149,7 +149,7 @@ boolean writeFileToFlash(uint32_t startAddress, SPIFlash spiFlash, char* fileNam
    
   File imageFile;
   if ((imageFile = SD.open(fileName)) == NULL) {
-    Serial.println(F("Can't open image file"));
+    //Serial.println(F("Can't open image file"));
     return false;
   }
   
@@ -194,13 +194,13 @@ void PrintTestName(char* text) {
     textRow = 10;    
   }  
   tft.drawString(5, textRow, text);
-  Serial.print(text);
+  //Serial.print(text);
 }
 
 void PrintTestResult(char* text) {
   tft.drawString(200, textRow, text);
-  Serial.print(": ");
-  Serial.println(text);
+  //Serial.print(": ");
+  //Serial.println(text);
 }
 
 int freeRam () {
