@@ -36,10 +36,10 @@ public:
 	void dispAscii(uint16_t x, uint16_t y, const char *p);
 	void setFontColor(uint16_t background,uint16_t foreground);
 	void setFontZoom(uint8_t Hsize, uint8_t Vsize);
-	void eableKeyScan(boolean on);
-	boolean isKeyPress(void);
+	void eableKeyScan(bool on);
+	bool isKeyPress(void);
 	uint8_t getKeyValue(void);
-	void backlightOn(boolean on);
+	void backlightOn(bool on);
 	void backlightAdjust(uint8_t value);	
 	void drawImageContinuous(uint32_t startaddress, uint32_t count, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 	void drawImageBlock(uint32_t startaddress, uint32_t count, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1,uint16_t pic_width, uint16_t block_width, uint16_t block_height);

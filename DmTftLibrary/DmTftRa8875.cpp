@@ -55,10 +55,15 @@ void DmTftRa8875::writeBus(uint8_t data) {
 
 uint8_t DmTftRa8875::readBus(void)
 {
+#if defined (DM_TOOLCHAIN_ARDUINO)
+
 	//SPCR = _spiSettings;		 // SPI Control Register
 	SPDR = 0;				 // SPI Data Register
 	while(!(SPSR & _BV(SPIF)));  // SPI Status Register Wait for transmission to finish
   return SPDR;
+#elif defined (DM_TOOLCHAIN_MBED)	
+  return _spi->write(0x00); // dummy byte to read
+#endif
 }
 
 void DmTftRa8875::sendCommand(uint8_t index) {
@@ -173,6 +178,7 @@ void DmTftRa8875::init(enum RA8875Size size) {
   _pinCS = new DigitalOut((PinName)_cs);
 	_pinSEL = new DigitalOut((PinName)_sel);
   sbi(_pinCS, _bitmaskCS);
+	cbi(
 
   _spi = new SPI((PinName)_mosi, (PinName)_miso, (PinName)_clk);
   _spi->format(8,0);
@@ -286,7 +292,7 @@ void DmTftRa8875::init(enum RA8875Size size) {
 
 }
 
-void DmTftRa8875::eableKeyScan(boolean on)
+void DmTftRa8875::eableKeyScan(bool on)
 {
 	if(on){
 		writeReg(0xC0, (1 << 7) | (0 << 4 ) | 1 );		 // enable key scan
@@ -309,7 +315,7 @@ uint8_t DmTftRa8875::getKeyValue(void)
 	
 }
  
-boolean DmTftRa8875::isKeyPress(void)
+bool DmTftRa8875::isKeyPress(void)
 {
 	uint8_t temp;
 	temp = readReg(0xF1);
@@ -322,7 +328,7 @@ boolean DmTftRa8875::isKeyPress(void)
 	}
 }
 
-void DmTftRa8875::backlightOn(boolean on)
+void DmTftRa8875::backlightOn(bool on)
 {
 	if(on){
 		writeReg(0x8A, (1 << 7) | (10 << 0 ));		 // enable PWM1 
@@ -334,17 +340,26 @@ void DmTftRa8875::backlightOn(boolean on)
 
 void DmTftRa8875::backlightAdjust(uint8_t value)
 {
-	writeReg(0x8B, value);	
+	writeReg(0x8B, value);
 }
 
 void DmTftRa8875::w25CtrlByMCU(void)
 {
+#if defined (DM_TOOLCHAIN_ARDUINO)
 	digitalWrite(_sel, LOW);
+#elif defined (DM_TOOLCHAIN_MBED)	
+
+#endif
 }
 
 void DmTftRa8875::w25CtrlByRa8875(void)
 {
+#if defined (DM_TOOLCHAIN_ARDUINO)
 	digitalWrite(_sel, HIGH);
+#elif defined (DM_TOOLCHAIN_MBED)	
+
+#endif
+
 }
 
 void DmTftRa8875::drawImageContinuous(uint32_t startaddress,uint32_t count,uint16_t x0,uint16_t y0,uint16_t x1,uint16_t y1)

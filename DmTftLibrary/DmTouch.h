@@ -26,8 +26,8 @@ public:
   	DM_TFT28_103 = 103,
     DM_TFT24_104 = 104,
     DM_TFT28_105 = 105,
-	DM_TFT35_107 = 107,
-	DM_TFT43_108 = 108
+		DM_TFT35_107 = 107,
+		DM_TFT43_108 = 108
   };
   
   enum SpiMode {
@@ -37,9 +37,9 @@ public:
   };
 
   enum TouchId{
-  	IC_8875 = 0x8875,
-	IC_2046 = 0x2046		
-  	};
+		IC_8875 = 0x8875,
+		IC_2046 = 0x2046		
+	};
   
   DmTouch(Display disp, SpiMode spiMode=Auto, bool useIrq=true);
   void init();
@@ -65,12 +65,6 @@ private:
   uint16_t getDisplayCoordinateY(uint16_t x_touch, uint16_t y_touch);
   uint16_t calculateMiddleValue(uint16_t values[], uint8_t count);
   bool isSampleValid();
-  
-  /*******  Add for RA8875 ******/
-  void  writeData(uint8_t d);
-  uint8_t  readData(void);
-  void  writeCommand(uint8_t d);
-  /***************************/
   
   bool _hardwareSpi;
   uint8_t _samplesPerMeasurement;
