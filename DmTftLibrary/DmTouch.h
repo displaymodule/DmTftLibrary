@@ -44,6 +44,7 @@ public:
   DmTouch(Display disp, SpiMode spiMode=Auto, bool useIrq=true);
   void init();
   void readTouchData(uint16_t& posX, uint16_t& posY, bool& touching);
+	bool readTouchData2(uint16_t& posX, uint16_t& posY);
   bool isTouched();
   bool getMiddleXY(uint16_t &x, uint16_t &y); // Raw Touch Data, used for calibration
   void setCalibrationMatrix(CalibrationMatrix calibrationMatrix);

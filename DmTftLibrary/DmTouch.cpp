@@ -12,7 +12,8 @@
 // Tested with Xpt2046 and Ra8875
 
 #include "DmTouch.h"
-#define MEASUREMENTS 10
+#define MEASUREMENTS 15
+#define ERR_RANGE 20
 
 // disp        - which display is used
 // spiMode     - How to read SPI-data, Software, Hardware or Auto
@@ -82,7 +83,7 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
 	_irq = -1;
   }
 
-  _samplesPerMeasurement = 3;
+  _samplesPerMeasurement = 1;
 }
 
 void DmTouch::init() {
@@ -368,10 +369,38 @@ void DmTouch::readTouchData(uint16_t& posX, uint16_t& posY, bool& touching) {
   posY = getDisplayCoordinateY(touchX, touchY);
 }
 
+bool DmTouch::readTouchData2(uint16_t& posX, uint16_t& posY) {
+#if defined (DM_TOOLCHAIN_MBED)
+  if (!isTouched()) {
+    //touching = false;
+    return;
+  }
+#endif
+  uint16_t touchX1, touchY1;
+	uint16_t touchX2, touchY2;
+	uint16_t touchX, touchY;
+
+  getMiddleXY(touchX1,touchY1); 
+	delay(1);
+	getMiddleXY(touchX2,touchY2); 
+	 if(((touchX2 <= touchX1 && touchX1 < touchX2 + ERR_RANGE)||(touchX1 <= touchX2 && touchX2 < touchX1 + ERR_RANGE))   // + -ERR_RANGE
+    &&((touchY2 <= touchY1 && touchY1 < touchY2 + ERR_RANGE)||(touchY1 <= touchY2 && touchY2 < touchY1 + ERR_RANGE)))
+	 	{
+	 		touchX = (touchX1 + touchX2)>>1;
+			touchY = (touchY1 + touchY2)>>1; 	
+  		posX = getDisplayCoordinateX(touchX, touchY);
+  		posY = getDisplayCoordinateY(touchX, touchY);
+			return true;
+	 	}
+	 else
+	 	return false;
+}
+
+
 bool DmTouch::isSampleValid() {
   uint16_t sampleX,sampleY;
   readRawData(sampleX,sampleY);
-  if (sampleX > 0 && sampleX < 4095 && sampleY > 0 && sampleY < 4095) {
+  if (sampleX > 20 && sampleX < 4095 && sampleY > 20 && sampleY < 4095) {
     return true;
   } else {
     return false;
@@ -401,14 +430,16 @@ bool DmTouch::getMiddleXY(uint16_t &x, uint16_t &y) {
    
   for (int i=0; i<MEASUREMENTS; i++) {
     getAverageXY(valuesX[i], valuesY[i]);
+#if 0  
     nbrOfMeasurements++;
     if (!isTouched()) {
       haveAllMeasurements = false;
       break;
     }
+#endif			
   }
-  x = calculateMiddleValue(valuesX, nbrOfMeasurements);
-  y = calculateMiddleValue(valuesY, nbrOfMeasurements);
+  x = calculateMiddleValue(valuesX, MEASUREMENTS);
+  y = calculateMiddleValue(valuesY, MEASUREMENTS);
    
   return haveAllMeasurements;
 }
