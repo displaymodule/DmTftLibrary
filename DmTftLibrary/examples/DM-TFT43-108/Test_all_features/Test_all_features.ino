@@ -63,18 +63,18 @@ void setup() {
   tft.backlightOn(true); // Turn on backlight
   tft.backlightAdjust(255);   // default value max
 
-  // Test Ra8875 Ascii character R 
-  tft.setFontColor(BLACK, WHITE);
-  tft.dispAscii(tft.width()/2, 10, "Hello DM!");
-  tft.setFontZoom(1, 1);
-  tft.setFontColor(BLACK, BLUE);
-  tft.dispAscii(tft.width()/2, 50, "Hello DM!");
+  // Test Ra8875 Ascii character  
+  //tft.setFontColor(BLACK, WHITE);
+  //tft.dispAscii(tft.width()/2, 10, "Hello DM!");
+  //tft.setFontZoom(1, 1);
+  //tft.setFontColor(BLACK, BLUE);
+  //tft.dispAscii(tft.width()/2, 50, "Hello DM!");
   //tft.setFontZoom(2, 2);
   //tft.setFontColor(WHITE, BLUE);
   //tft.dispAscii(tft.width()/2, 100, "Hello DM!");
 
   tft.setFontColor(BLACK, WHITE);
-  tft.setFontZoom(0, 0);
+  //tft.setFontZoom(0, 0);
   
   //tft.drawString(35, 10, "www.displaymodule.com");
   tft.dispAscii(35, 10, "www.displaymodule.com");
