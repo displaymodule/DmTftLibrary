@@ -51,16 +51,16 @@ public:
   void setPrecison(uint8_t samplesPerMeasurement);
   void waitForTouch();
   void waitForTouchRelease();
-  void readRawData(uint16_t &x, uint16_t &y);
-  uint32_t rescaleFactor() { return 1000000; };
-  int8_t _irq;  
-  uint16_t _touch_id;  
+
+  uint32_t rescaleFactor() { return 1000000; }; 
+ 
   
 private:
   void spiWrite(uint8_t data);
   uint8_t spiRead();
   uint16_t readData12(uint8_t command);
   void enableIrq();
+  void readRawData(uint16_t &x, uint16_t &y);	
   void getAverageXY(uint16_t &x, uint16_t &y);
   uint16_t getDisplayCoordinateX(uint16_t x_touch, uint16_t y_touch);
   uint16_t getDisplayCoordinateY(uint16_t x_touch, uint16_t y_touch);
@@ -71,6 +71,8 @@ private:
   uint8_t _samplesPerMeasurement;
   CalibrationMatrix _calibrationMatrix;
   uint8_t _cs, _clk, _mosi, _miso;
+  int8_t _irq; 
+  uint16_t _touch_id; 	
 #if defined (DM_TOOLCHAIN_ARDUINO)
   regtype *_pinDC, *_pinCS, *_pinCLK, *_pinMOSI, *_pinMISO, *_pinIrq;
   regsize _bitmaskDC, _bitmaskCS, _bitmaskCLK, _bitmaskMOSI, _bitmaskMISO, _bitmaskIrq;

@@ -29,8 +29,8 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
       _clk = A1;
       _mosi = A0;
       _miso = D9;
-	  _hardwareSpi = false;
-		_touch_id = IC_2046;
+      _hardwareSpi = false;
+      _touch_id = IC_2046;
       break;
     
     case DmTouch::DM_TFT28_105:
@@ -39,8 +39,8 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
       _clk = D13;
       _mosi = D11;
       _miso = D12;
-	  _hardwareSpi = true;
-		_touch_id = IC_2046;
+      _hardwareSpi = true;
+      _touch_id = IC_2046;
       break;
 
     case DmTouch::DM_TFT35_107:
@@ -49,8 +49,8 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
       _clk = D13;
       _mosi = D11;
       _miso = D12;
-	  _hardwareSpi = true;
-		_touch_id = IC_2046;
+      _hardwareSpi = true;
+      _touch_id = IC_2046;
 			break;
 
     case DmTouch::DM_TFT43_108:
@@ -59,8 +59,8 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
       _clk = D13;
       _mosi = D11;
       _miso = D12;
-	  _hardwareSpi = true;
-		_touch_id = IC_8875;
+      _hardwareSpi = true;
+      _touch_id = IC_8875;
 			break;
 			
     default:
@@ -69,8 +69,8 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
       _clk = D13;
       _mosi = D11;
       _miso = D12;
-	  _hardwareSpi = true;
-		_touch_id = IC_2046;
+      _hardwareSpi = true;
+      _touch_id = IC_2046;
       break;
   }
   
@@ -372,7 +372,6 @@ void DmTouch::readTouchData(uint16_t& posX, uint16_t& posY, bool& touching) {
 bool DmTouch::readTouchData2(uint16_t& posX, uint16_t& posY) {
 #if defined (DM_TOOLCHAIN_MBED)
   if (!isTouched()) {
-    //touching = false;
     return;
   }
 #endif
@@ -381,7 +380,7 @@ bool DmTouch::readTouchData2(uint16_t& posX, uint16_t& posY) {
 	uint16_t touchX, touchY;
 
   getMiddleXY(touchX1,touchY1); 
-	delay(1);
+	delay(3);
 	getMiddleXY(touchX2,touchY2); 
 	 if(((touchX2 <= touchX1 && touchX1 < touchX2 + ERR_RANGE)||(touchX1 <= touchX2 && touchX2 < touchX1 + ERR_RANGE))   // + -ERR_RANGE
     &&((touchY2 <= touchY1 && touchY1 < touchY2 + ERR_RANGE)||(touchY1 <= touchY2 && touchY2 < touchY1 + ERR_RANGE)))
@@ -414,6 +413,18 @@ bool DmTouch::isTouched() {
 	}
 	
 	if ( !gbi(_pinIrq, _bitmaskIrq) ) {
+		if(_touch_id == IC_8875){
+			// Clear TP INT Status 
+			cbi(_pinCS, _bitmaskCS);
+			spiWrite(0x80);
+  		spiWrite(0xF1);		
+			sbi(_pinCS, _bitmaskCS);
+
+			cbi(_pinCS, _bitmaskCS);
+  		spiWrite(0x00);
+  		spiWrite(0x04);	
+			sbi(_pinCS, _bitmaskCS);			
+			}
   	return true;
 	}
   return false;
