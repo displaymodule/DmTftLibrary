@@ -12,11 +12,12 @@
 
 This is Display Module TFT library which supports it's displays. Have a look at the current displays at www.displaymodule.com.
 
+### History ###
 
 * v1.0
 * A lightweight TFT library with support for most popular features.
 
-
+* v1.1 Add suport for DM-TFT43-108
 
 ### How to install the library ###
 
