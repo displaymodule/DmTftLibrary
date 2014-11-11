@@ -55,7 +55,6 @@ void loop() {
       calibration.drawCalibPoint(displayRefPoint[3].x, displayRefPoint[3].y); 
       calibration.drawCalibPoint(displayRefPoint[4].x, displayRefPoint[4].y);
       calibration.drawCalibration(calibrationMatrix);
-      dmTouch.readRawData(x,y);
       calibrated = true;
     } else {
       tft.clearScreen(BLACK);
@@ -71,6 +70,9 @@ void loop() {
   if (dmTouch.isTouched()) {
     dmTouch.readTouchData(x,y,touched);
     calibration.drawCalibPoint(x, y);
+    
+    /* Another way to read touch data */
+    // if(dmTouch.readTouchData2(x,y)) calibration.drawCalibPoint(x, y);    
   }
 }
 

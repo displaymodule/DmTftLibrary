@@ -160,7 +160,7 @@ void setup()
         break;
         
         case 4:
-          PrintTestName("Key 4 is pressed!");
+          PrintTestName("Key 5 is pressed!");
         break;  
         
         default :

@@ -82,11 +82,10 @@ protected:
   DigitalOut* _pinCS;
   uint8_t _bitmaskCS;
 #endif
-
-	uint16_t _width;
-  uint16_t _height;
 	
 private:
+	uint16_t _width;
+  uint16_t _height;
 
   uint16_t _bgColor;
   uint16_t _fgColor;

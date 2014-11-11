@@ -26,8 +26,8 @@ public:
   	DM_TFT28_103 = 103,
     DM_TFT24_104 = 104,
     DM_TFT28_105 = 105,
-	DM_TFT35_107 = 107,
-	DM_TFT43_108 = 108
+		DM_TFT35_107 = 107,
+		DM_TFT43_108 = 108
   };
   
   enum SpiMode {
@@ -37,45 +37,42 @@ public:
   };
 
   enum TouchId{
-  	IC_8875 = 0x8875,
-	IC_2046 = 0x2046		
-  	};
+		IC_8875 = 0x8875,
+		IC_2046 = 0x2046		
+	};
   
   DmTouch(Display disp, SpiMode spiMode=Auto, bool useIrq=true);
   void init();
   void readTouchData(uint16_t& posX, uint16_t& posY, bool& touching);
+	bool readTouchData2(uint16_t& posX, uint16_t& posY);
   bool isTouched();
   bool getMiddleXY(uint16_t &x, uint16_t &y); // Raw Touch Data, used for calibration
   void setCalibrationMatrix(CalibrationMatrix calibrationMatrix);
   void setPrecison(uint8_t samplesPerMeasurement);
   void waitForTouch();
   void waitForTouchRelease();
-  void readRawData(uint16_t &x, uint16_t &y);
-  uint32_t rescaleFactor() { return 1000000; };
-  int8_t _irq;  
-  uint16_t _touch_id;  
+
+  uint32_t rescaleFactor() { return 1000000; }; 
+ 
   
 private:
   void spiWrite(uint8_t data);
   uint8_t spiRead();
   uint16_t readData12(uint8_t command);
   void enableIrq();
+  void readRawData(uint16_t &x, uint16_t &y);	
   void getAverageXY(uint16_t &x, uint16_t &y);
   uint16_t getDisplayCoordinateX(uint16_t x_touch, uint16_t y_touch);
   uint16_t getDisplayCoordinateY(uint16_t x_touch, uint16_t y_touch);
   uint16_t calculateMiddleValue(uint16_t values[], uint8_t count);
   bool isSampleValid();
   
-  /*******  Add for RA8875 ******/
-  void  writeData(uint8_t d);
-  uint8_t  readData(void);
-  void  writeCommand(uint8_t d);
-  /***************************/
-  
   bool _hardwareSpi;
   uint8_t _samplesPerMeasurement;
   CalibrationMatrix _calibrationMatrix;
   uint8_t _cs, _clk, _mosi, _miso;
+  int8_t _irq; 
+  uint16_t _touch_id; 	
 #if defined (DM_TOOLCHAIN_ARDUINO)
   regtype *_pinDC, *_pinCS, *_pinCLK, *_pinMOSI, *_pinMISO, *_pinIrq;
   regsize _bitmaskDC, _bitmaskCS, _bitmaskCLK, _bitmaskMOSI, _bitmaskMISO, _bitmaskIrq;
