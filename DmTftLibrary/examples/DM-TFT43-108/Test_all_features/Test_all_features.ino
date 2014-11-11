@@ -76,8 +76,8 @@ void setup() {
   tft.setFontColor(BLACK, WHITE);
   //tft.setFontZoom(0, 0);
   
-  //tft.drawString(35, 10, "www.displaymodule.com");
-  tft.dispAscii(35, 10, "www.displaymodule.com");
+  tft.drawString(35, 10, "www.displaymodule.com");
+  //tft.dispAscii(35, 10, "www.displaymodule.com");
   
   PrintTestName("Check bmp on SD-card");
   if (!SD.begin(SD_CS)) {

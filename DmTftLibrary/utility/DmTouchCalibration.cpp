@@ -133,7 +133,7 @@ void DmTouchCalibration::releaseTouch(uint16_t x, uint16_t y) {
   _tft->fillCircle(x, y, 10, GREEN);
   delay(100);
   _tft->fillCircle(x, y, 10, BLACK);
-  delay(400);
+  delay(300);
 	_touch->waitForTouchRelease();
 }
 
