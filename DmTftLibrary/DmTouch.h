@@ -26,8 +26,12 @@ public:
   	DM_TFT28_103 = 103,
     DM_TFT24_104 = 104,
     DM_TFT28_105 = 105,
-		DM_TFT35_107 = 107,
-		DM_TFT43_108 = 108
+	DM_TFT35_107 = 107,
+	DM_TFT43_108 = 108,
+	DM_TFT18_310 = 310,
+	DM_TFT24_312 = 312,
+	DM_TFT24_314 = 314,
+	DM_TFT24_316 = 316
   };
   
   enum SpiMode {

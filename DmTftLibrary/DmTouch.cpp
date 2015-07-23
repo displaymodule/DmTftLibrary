@@ -12,6 +12,9 @@
 // Tested with Xpt2046 and Ra8875
 
 #include "DmTouch.h"
+//#define log(...) Serial.println(__VA_ARGS__)
+#define log(...)
+
 #define MEASUREMENTS 15
 #define ERR_RANGE 20
 
@@ -21,7 +24,19 @@
 DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
 {
   switch (disp) {
-    // Display with 40-pin connector on top of adapter board
+    case DmTouch::DM_TFT18_310:   	
+    case DmTouch::DM_TFT24_312:
+    case DmTouch::DM_TFT24_314:
+	case DmTouch::DM_TFT24_316:
+      _cs = D8;
+      _irq = D9;
+      _clk = D13;
+      _mosi = D11;
+      _miso = D12;
+      _hardwareSpi = true;
+      _touch_id = IC_2046;
+      break;  	  
+	// Display with 40-pin connector on top of adapter board	  
     case DmTouch::DM_TFT28_103:
     case DmTouch::DM_TFT24_104:
       _cs = D8;
@@ -31,8 +46,7 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
       _miso = D9;
       _hardwareSpi = false;
       _touch_id = IC_2046;
-      break;
-    
+      break;    
     case DmTouch::DM_TFT28_105:
       _cs = D4;
       _irq = D2;
@@ -42,7 +56,6 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
       _hardwareSpi = true;
       _touch_id = IC_2046;
       break;
-
     case DmTouch::DM_TFT35_107:
       _cs = D4;
       _irq = D2;
@@ -51,8 +64,7 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
       _miso = D12;
       _hardwareSpi = true;
       _touch_id = IC_2046;
-			break;
-
+	  break;
     case DmTouch::DM_TFT43_108:
       _cs = D10;
       _irq = D2;
@@ -61,8 +73,7 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
       _miso = D12;
       _hardwareSpi = true;
       _touch_id = IC_8875;
-			break;
-			
+	  break;			
     default:
       _cs = D4;
       _irq = D2;
@@ -87,6 +98,7 @@ DmTouch::DmTouch(Display disp, SpiMode spiMode, bool useIrq)
 }
 
 void DmTouch::init() {
+log("enter init()");
 #if defined (DM_TOOLCHAIN_ARDUINO)
   pinMode(_cs, OUTPUT);
   _pinCS  = portOutputRegister(digitalPinToPort(_cs));
@@ -128,9 +140,11 @@ void DmTouch::init() {
   if (_irq != -1) { // We will use Touch IRQ
     enableIrq();
   }
+log("exit init()");
 }
 
 void DmTouch::enableIrq() {
+log("enter enableIrq()");	
 #if defined (DM_TOOLCHAIN_ARDUINO)
   pinMode(_irq, INPUT);
   _pinIrq = portInputRegister(digitalPinToPort(_irq));
@@ -140,43 +154,43 @@ void DmTouch::enableIrq() {
   _pinIrq->mode(PullUp);
 #endif  
 	if(_touch_id == IC_8875){
-    // enable touch panel
-    cbi(_pinCS, _bitmaskCS);
+    	// enable touch panel
+    	cbi(_pinCS, _bitmaskCS);
 		spiWrite(0x80);
-    spiWrite(0x70); 
+    	spiWrite(0x70); 
 		sbi(_pinCS, _bitmaskCS);
 
 		cbi(_pinCS, _bitmaskCS);
 		spiWrite(0x00);
-    spiWrite(0xB3);
+    	spiWrite(0xB3);
 		sbi(_pinCS, _bitmaskCS);
 
 		// set auto mode
 		cbi(_pinCS, _bitmaskCS);
 		spiWrite(0x80);
-    spiWrite(0x71);  
+    	spiWrite(0x71);  
 		sbi(_pinCS, _bitmaskCS);
 		
 		cbi(_pinCS, _bitmaskCS);
 		spiWrite(0x00);
-    spiWrite(0x04);	
+    	spiWrite(0x04);	
 		sbi(_pinCS, _bitmaskCS);
 
 		// enable touch panel interrupt
 		cbi(_pinCS, _bitmaskCS);
 		spiWrite(0x80);
-    spiWrite(0xF0);
+    	spiWrite(0xF0);
 		sbi(_pinCS, _bitmaskCS);
 
 		cbi(_pinCS, _bitmaskCS);
 		uint8_t temp;
 		spiWrite(0x40);
-    temp = spiRead();
+    	temp = spiRead();
 		sbi(_pinCS, _bitmaskCS);
 
 		cbi(_pinCS, _bitmaskCS);
-	  spiWrite(0x80);
-    spiWrite(0xF0); 
+	  	spiWrite(0x80);
+    	spiWrite(0xF0); 
 		sbi(_pinCS, _bitmaskCS);
 		
 		cbi(_pinCS, _bitmaskCS);
@@ -186,9 +200,10 @@ void DmTouch::enableIrq() {
 	}
 	else{
 		cbi(_pinCS, _bitmaskCS);
-  	spiWrite(0x80); // Enable PENIRQ
-  	sbi(_pinCS, _bitmaskCS);
+  		spiWrite(0x80); // Enable PENIRQ
+  		sbi(_pinCS, _bitmaskCS);
 	}  
+log("exit enableIrq()");	
 }
 
 void DmTouch::spiWrite(uint8_t data) {
@@ -227,7 +242,6 @@ uint8_t DmTouch::spiRead() {// Only used for Hardware SPI
   SPCR = _spiSettings;
   spiWrite(0x00);
   data = SPDR;
-
   return data;
 #elif defined (DM_TOOLCHAIN_MBED)
   if (_hardwareSpi) {

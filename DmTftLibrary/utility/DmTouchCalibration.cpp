@@ -11,6 +11,8 @@
  ********************************************************************************************/
 
 #include "DmTouchCalibration.h"
+//#define log(...) Serial.println(__VA_ARGS__)
+#define log(...)
 
 DmTouchCalibration::DmTouchCalibration(DmTftBase *tftBase, DmTouch *touch) {
   _tft = tftBase;
@@ -30,7 +32,6 @@ CalibrationMatrix DmTouchCalibration::getDefaultCalibrationData(int disp) {
       calibrationMatrix.e = 89313;
       calibrationMatrix.f = -10726623;
       break;
-
     case DmTouch::DM_TFT24_104:
       calibrationMatrix.a = -71855;
       calibrationMatrix.b = 2147;
@@ -38,17 +39,7 @@ CalibrationMatrix DmTouchCalibration::getDefaultCalibrationData(int disp) {
       calibrationMatrix.d = -1339;
       calibrationMatrix.e = -91012;
       calibrationMatrix.f = 354268832;
-      break;
-
-    case DmTouch::DM_TFT35_107:
-      calibrationMatrix.a = 85984;
-      calibrationMatrix.b = 451;
-      calibrationMatrix.c = -16494041;
-      calibrationMatrix.d = 2308;
-      calibrationMatrix.e = 65173;
-      calibrationMatrix.f = -19179080;
-      break;
-	  
+      break;    	  
     case DmTouch::DM_TFT28_105:
       calibrationMatrix.a = 65521;
       calibrationMatrix.b = -253;
@@ -56,27 +47,65 @@ CalibrationMatrix DmTouchCalibration::getDefaultCalibrationData(int disp) {
       calibrationMatrix.d = -439;
       calibrationMatrix.e = 89201;
       calibrationMatrix.f = -10450920;
-			break;
-			
-		case DmTouch::DM_TFT43_108: 
-			if(_tft->width() == 480){
-      	calibrationMatrix.a = 541307;
-      	calibrationMatrix.b = -4288;
-      	calibrationMatrix.c = -36678732;
-      	calibrationMatrix.d = 2730;
-      	calibrationMatrix.e = 321714;
-      	calibrationMatrix.f = -31439472;	
-			}
-			else if(_tft->width() == 800){
-      	calibrationMatrix.a = 871837;
-      	calibrationMatrix.b = 7273;
-      	calibrationMatrix.c = -57891280;
-      	calibrationMatrix.d = -5861;
-      	calibrationMatrix.e = 536190;
-      	calibrationMatrix.f = -39840708;					
-			}
-			break;
-			
+	  break;	
+	case DmTouch::DM_TFT35_107:
+      calibrationMatrix.a = 85984;
+      calibrationMatrix.b = 451;
+      calibrationMatrix.c = -16494041;
+      calibrationMatrix.d = 2308;
+      calibrationMatrix.e = 65173;
+      calibrationMatrix.f = -19179080;
+      break;	  
+	case DmTouch::DM_TFT43_108: 
+		if(_tft->width() == 480){
+      		calibrationMatrix.a = 541307;
+      		calibrationMatrix.b = -4288;
+      		calibrationMatrix.c = -36678732;
+      		calibrationMatrix.d = 2730;
+      		calibrationMatrix.e = 321714;
+      		calibrationMatrix.f = -31439472;	
+		}
+		else if(_tft->width() == 800){
+      		calibrationMatrix.a = 871837;
+      		calibrationMatrix.b = 7273;
+      		calibrationMatrix.c = -57891280;
+      		calibrationMatrix.d = -5861;
+      		calibrationMatrix.e = 536190;
+      		calibrationMatrix.f = -39840708;					
+		}
+		break;
+	case DmTouch::DM_TFT18_310:
+	  calibrationMatrix.a = 34852;
+	  calibrationMatrix.b = -242;
+	  calibrationMatrix.c = -5593092;
+	  calibrationMatrix.d = 244;
+	  calibrationMatrix.e = 46016;
+	  calibrationMatrix.f = -10464877;
+	  break;
+	case DmTouch::DM_TFT24_312:
+	  calibrationMatrix.a = 64832;
+	  calibrationMatrix.b = -663;
+	  calibrationMatrix.c = -8230510;
+	  calibrationMatrix.d = 652;
+	  calibrationMatrix.e = -86408;
+	  calibrationMatrix.f = 338477984;
+	  break;	  
+	case DmTouch::DM_TFT24_314:
+	  calibrationMatrix.a = 64894;
+	  calibrationMatrix.b = -58;
+	  calibrationMatrix.c = -14175864;
+	  calibrationMatrix.d = -412;
+	  calibrationMatrix.e = 87172;
+	  calibrationMatrix.f = -12410956;
+	  break;	
+	case DmTouch::DM_TFT24_316:
+	  calibrationMatrix.a = -65670;
+	  calibrationMatrix.b = 1494;
+	  calibrationMatrix.c = 247084992;
+	  calibrationMatrix.d = -96;
+	  calibrationMatrix.e = -88946;
+	  calibrationMatrix.f = 331414016;
+	  break;	  
     default:
       break;
   }
@@ -85,7 +114,8 @@ CalibrationMatrix DmTouchCalibration::getDefaultCalibrationData(int disp) {
 
 
 bool DmTouchCalibration::getTouchReferencePoints(Point displayRefPoint[], Point touchRefPoint[], uint16_t tftWidth, uint16_t tftHeight) {
-  _touch->setPrecison(60);
+
+	_touch->setPrecison(60);
   displayRefPoint[0].x = (tftWidth / 2);
   displayRefPoint[0].y = (tftHeight / 2);
   displayRefPoint[1].x = 1 * (tftWidth / 5);
@@ -113,7 +143,6 @@ bool DmTouchCalibration::getRawTouch(uint16_t& x, uint16_t& y) {
   bool hasAllSamples = false;
   while(!touched) {
     if (_touch->isTouched()) {
-      Serial.println("is touched");
       hasAllSamples = _touch->getMiddleXY(x, y);			
       touched = true; 
     }
