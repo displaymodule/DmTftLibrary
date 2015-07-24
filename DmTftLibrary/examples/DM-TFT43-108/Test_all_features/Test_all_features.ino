@@ -51,8 +51,8 @@ void setup() {
   //Serial.println(freeRam());
   
   Serial.println(F("Init TFT drivers"));
-  // 'RA8875_480x272' or 'RA8875_800x480'
-  tft.init(RA8875_480x272);
+  //RA8875_320x240, RA8875_480x272 or RA8875_800x480
+  tft.init(RA8875_320x240);
   // With hardware accelleration this is instant
   tft.clearScreen(BLACK);
   
@@ -102,7 +102,7 @@ void setup() {
   PrintTestName("Erase Flash ");
   eraseFlash(spiFlash);
   PrintTestResult("OK");
-  
+#if 0  
   PrintTestName("Write bmp to ext. flash");
   if (!writeFileToFlash(0, spiFlash, "flashlog.bmp")) {
     PrintTestResult("Fail");
@@ -113,7 +113,7 @@ void setup() {
   PrintTestName("Draw bmp ext. Flash");
   spiFlashImage.drawImage(0, spiFlash, tft, 0, 200);
   PrintTestResult("OK");
- 
+#endif  
   PrintTestName("Draw bmp SD-card");
   sdCardImage.drawImage("sdlogo.bmp", tft, 181, 200);
   PrintTestResult("OK");
@@ -123,8 +123,8 @@ void setup() {
   tft.clearScreen(BLACK);
   
   spiFlashImage.drawImage(0, spiFlash, tft, 0, 0);
-  tft.drawString(36,30,"www.displaymodule.com");
-  tft.drawString(24,50,"Press the colored squares");
+  tft.drawString(36,10,"www.displaymodule.com");
+  tft.drawString(24,30,"Press the colored squares");
   
   pressSquare(tft.width()/4, tft.height()/4, tft.width()/4 + 40, tft.height()/4 + 40, BLUE);
   pressSquare(tft.width()*3/4, tft.height()/4, tft.width()*3/4 + 40, tft.height()/4 + 40, RED);

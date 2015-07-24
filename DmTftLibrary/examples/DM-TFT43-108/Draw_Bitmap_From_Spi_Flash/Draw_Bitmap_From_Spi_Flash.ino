@@ -24,6 +24,7 @@ DmTftRa8875 tft = DmTftRa8875(TFT_CS, F_SEL);
 DmDrawBmpFromSpiFlash drawImage = DmDrawBmpFromSpiFlash();
 
 SPIFlash spiFlash(F_CS, 0xEF40);
+uint16_t textRow = 0;
 
 void setup()
 {
@@ -36,19 +37,26 @@ void setup()
   digitalWrite(F_CS, HIGH);
   
   Serial.begin(9600);
-  //'RA8875_480x272' or 'RA8875_800x480'
-  tft.init(RA8875_480x272);
+  //RA8875_320x240, RA8875_480x272 or RA8875_800x480
+  tft.init(RA8875_320x240);
   tft.backlightOn(true); // Turn on backlight
   tft.backlightAdjust(255);   // default value max
   
   initFlash(spiFlash);
-  
+  tft.drawString(5, 0, "www.displaymodule.com");
   Serial.print(F("Initializing SD-card: "));
+  PrintTestName("Initializing SD-card: ");
   if (SD.begin(SD_CS)) {
+    PrintTestResult("OK");
     Serial.println(F("OK"));
     // SD-card found, write from SD-card to flash memory
+    PrintTestName("Erase Flash... ");
     eraseFlash(spiFlash);
+    PrintTestResult("OK");
+    
+    PrintTestName("Write bmp to ext. flash");
     writeFileToFlash(0, spiFlash, "logol565.bmp");
+    PrintTestResult("OK");
   }
   else
   {
@@ -121,4 +129,19 @@ void writeFileToFlash(uint32_t startAddress, SPIFlash spiFlash, char* fileName) 
   imageFile.close();
   
   Serial.println(F("OK"));
+}
+void PrintTestName(char* text) {
+  textRow += 20;
+  
+  if(textRow >= tft.height()-20){
+    tft.clearScreen(BLACK);
+    textRow = 10;    
+  }  
+  tft.drawString(5, textRow, text);
+  Serial.print(text);
+}
+void PrintTestResult(char* text) {
+  tft.drawString(200, textRow, text);
+  Serial.print(": ");
+  Serial.println(text);
 }

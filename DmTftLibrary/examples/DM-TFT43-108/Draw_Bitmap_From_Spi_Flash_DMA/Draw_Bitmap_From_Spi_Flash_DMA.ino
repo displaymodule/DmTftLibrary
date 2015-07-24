@@ -40,8 +40,8 @@ void setup()
   digitalWrite(F_CS, HIGH);
   
   Serial.begin(9600);
-  //'RA8875_480x272' or 'RA8875_800x480'
-  tft.init(RA8875_480x272);
+  //RA8875_320x240, RA8875_480x272 or RA8875_800x480
+  tft.init(RA8875_320x240);
   tft.backlightOn(true); // Turn on backlight
   tft.backlightAdjust(255);   // default value max
   
@@ -59,11 +59,11 @@ void setup()
     PrintTestResult("Fail");
   }
     // write from SD-card to flash memory
-    PrintTestName("Erase Flash ");
+    PrintTestName("Erase Flash...");
     eraseFlash(spiFlash);
     PrintTestResult("OK");
     
-    PrintTestName("Write bmp to ext. flash");
+    PrintTestName("Write bin to ext. flash");
     writeFileToFlash(0, spiFlash, "logol565.bin");
     PrintTestResult("OK");
     

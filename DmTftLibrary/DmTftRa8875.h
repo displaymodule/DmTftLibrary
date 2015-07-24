@@ -16,6 +16,7 @@
 #include "DmTftBase.h"
 
 enum RA8875Size{ 
+	RA8875_320x240,  //DM-TFT35-323/324
 	RA8875_480x272, 
 	RA8875_800x480 
 };

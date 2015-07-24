@@ -9,8 +9,10 @@
 
 DmTftRa8875 tft = DmTftRa8875();
 
-BubbleDemo bubbleDemo(&tft, 480, 272);  
-// if use RA8875_800x480 please 
+BubbleDemo bubbleDemo(&tft, 320, 240);  
+// if use RA8875_480x272 use 
+// BubbleDemo bubbleDemo(&tft, 480, 272);
+// if use RA8875_800x480 use 
 // BubbleDemo bubbleDemo(&tft, 800, 480);
 
 void setup ()
@@ -25,8 +27,8 @@ void setup ()
   digitalWrite(SD_CS, HIGH);
   digitalWrite(F_CS, HIGH);
   
-  //'RA8875_480x272' or 'RA8875_800x480'
-  tft.init(RA8875_480x272);
+  //RA8875_320x240, RA8875_480x272 or RA8875_800x480
+  tft.init(RA8875_320x240);
   tft.backlightOn(true); // Turn on backlight
   tft.backlightAdjust(255);   // default value max
 }

@@ -27,8 +27,8 @@ void setup() {
   digitalWrite(F_CS, HIGH);
   
   Serial.begin(9600);
-  //'RA8875_480x272' or 'RA8875_800x480'
-  tft.init(RA8875_480x272);
+  //RA8875_320x240, RA8875_480x272 or RA8875_800x480
+  tft.init(RA8875_320x240);
   dmTouch.init();
   tft.backlightOn(true); // Turn on backlight
   tft.backlightAdjust(255);   // default value max  

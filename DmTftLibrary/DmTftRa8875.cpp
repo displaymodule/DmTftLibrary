@@ -197,11 +197,31 @@ void DmTftRa8875::init(enum RA8875Size size) {
 	uint8_t vsync_pw; 
 	uint16_t vsync_nondisp;
 	uint16_t vsync_start;
-
-	if(size == RA8875_480x272){
+	if(size == RA8875_320x240){
+		_width = 320;
+		_height = 240;
+        setWidth(_width);
+		setHeight(_height);
+		// PLL init 
+		// 20MHz*(10+1)/((RA8875_PLLC1_PLLDIV1 +1) * 2^RA8875_PLLC2_DIV4))
+		writeReg(0x88, 0x00 + 10);
+		delay(1);
+		writeReg(0x89, 0x02);
+		delay(1);
+	
+		pixclk = 0x00 | 0x03;
+		hsync_nondisp = 32;
+		hsync_start = 24;
+		hsync_pw = 32;
+		hsync_finetune = 0;
+		vsync_nondisp = 15;
+		vsync_start = 4;
+		vsync_pw = 3;
+	}
+	else if(size == RA8875_480x272){
 		_width = 480;
 		_height = 272;
-    setWidth(_width);
+        setWidth(_width);
 		setHeight(_height);
 		// PLL init 
 		// 20MHz*(10+1)/((RA8875_PLLC1_PLLDIV1 +1) * 2^RA8875_PLLC2_DIV4))
@@ -210,20 +230,19 @@ void DmTftRa8875::init(enum RA8875Size size) {
 		writeReg(0x89, 0x02);
 		delay(1);
 	
-		pixclk					= 0x80 | 0x02;
-		hsync_nondisp 	= 10;
-		hsync_start 		= 8;
-		hsync_pw				= 48;
-		hsync_finetune	= 0;
-		vsync_nondisp 	= 3;
-		vsync_start 		= 8;
-		vsync_pw				= 10;
+		pixclk = 0x80 | 0x02;
+		hsync_nondisp = 10;
+		hsync_start = 8;
+		hsync_pw = 48;
+		hsync_finetune = 0;
+		vsync_nondisp = 3;
+		vsync_start = 8;
+		vsync_pw = 10;
 	}
-
-	if(size == RA8875_800x480){		
+	else if(size == RA8875_800x480){		
 		_width = 800;
 		_height = 480;
-    setWidth(_width);
+        setWidth(_width);
 		setHeight(_height);
 		// PLL init 
 		// 20MHz*(10+1)/((RA8875_PLLC1_PLLDIV1 +1) * 2^RA8875_PLLC2_DIV4))
@@ -232,14 +251,14 @@ void DmTftRa8875::init(enum RA8875Size size) {
 		writeReg(0x89, 0x02);
 		delay(1);
 	
-		pixclk					= 0x80 | 0x01;
-		hsync_nondisp 	= 26;
-		hsync_start 		= 32;
-		hsync_pw				= 96;
-		hsync_finetune	= 0;
-		vsync_nondisp 	= 32;
-		vsync_start 		= 23;
-		vsync_pw				= 2;
+		pixclk = 0x80 | 0x01;
+		hsync_nondisp = 26;
+		hsync_start = 32;
+		hsync_pw = 96;
+		hsync_finetune = 0;
+		vsync_nondisp = 32;
+		vsync_start = 23;
+		vsync_pw = 2;
 	}
 
 	writeReg(0x10, 0x0C | 0x00);
@@ -248,21 +267,28 @@ void DmTftRa8875::init(enum RA8875Size size) {
   delay(1);
   
   /* Horizontal settings registers */
-  writeReg(0x14, (_width / 8) - 1);                          // H width: (HDWR + 1) * 8 = 480
-  writeReg(0x15, 0x00 + hsync_finetune);
-  writeReg(0x16, (hsync_nondisp - hsync_finetune - 2)/8);    // H non-display: HNDR * 8 + HNDFTR + 2 = 10
+  writeReg(0x14, (_width / 8) - 1);    // H width: (HDWR + 1) * 8 = 480
+  if(size == RA8875_320x240){
+  	writeReg(0x15, 0x80 + hsync_finetune);
+  }else{
+  	writeReg(0x15, 0x00 + hsync_finetune);
+  }
+  writeReg(0x16, (hsync_nondisp - hsync_finetune - 2)/8 - 1);    // H non-display: HNDR * 8 + HNDFTR + 2 = 10
   writeReg(0x17, hsync_start/8 - 1);                         // Hsync start: (HSTR + 1)*8 
-  writeReg(0x18, 0x00 + (hsync_pw/8 - 1));        // HSync pulse width = (HPWR+1) * 8
+  writeReg(0x18, 0x80 + (hsync_pw/8 - 1));        // HSync pulse width = (HPWR+1) * 8
   
   /* Vertical settings registers */
-  writeReg(0x19, (uint16_t)(_height - 1) & 0xFF);
+  writeReg(0x19, (uint16_t)(_height - 1) & 0xFF);   // VDHR + 1 = 800
   writeReg(0x1A, (uint16_t)(_height - 1) >> 8);
   writeReg(0x1B, vsync_nondisp-1);                          // V non-display period = VNDR + 1
   writeReg(0x1C, vsync_nondisp >> 8);
   writeReg(0x1D, vsync_start-1);                            // Vsync start position = VSTR + 1
   writeReg(0x1E, vsync_start >> 8);
-  writeReg(0x1F, 0x00 + vsync_pw - 1);            // Vsync pulse width = VPWR + 1
-  
+  if(size == RA8875_320x240){ 
+  	writeReg(0x1F, 0x80 + vsync_pw - 1);    // Vsync pulse width = VPWR + 1
+  }else{
+  	writeReg(0x1F, 0x00 + vsync_pw - 1);
+  }  
   /* Set active window X */
   writeReg(0x30, 0);                                        // horizontal start point
   writeReg(0x31, 0);
