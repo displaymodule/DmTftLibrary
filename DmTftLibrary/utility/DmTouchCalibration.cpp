@@ -64,14 +64,14 @@ CalibrationMatrix DmTouchCalibration::getDefaultCalibrationData(int disp) {
       		calibrationMatrix.d = -241;
       		calibrationMatrix.e = 271933;
       		calibrationMatrix.f = -23184312;	
-		}else if(_tft->width() == 480){  // DM-TFT43-302
+		}else if(_tft->width() == 480){  // DM-TFT43-302 or DM-TFT43-327
       		calibrationMatrix.a = 541307;
       		calibrationMatrix.b = -4288;
       		calibrationMatrix.c = -36678732;
       		calibrationMatrix.d = 2730;
       		calibrationMatrix.e = 321714;
       		calibrationMatrix.f = -31439472;	
-		}else if(_tft->width() == 800){   //DM-TFT50-303
+		}else if(_tft->width() == 800){   //DM-TFT50-303 or DM-TFT50-318
       		calibrationMatrix.a = 871837;
       		calibrationMatrix.b = 7273;
       		calibrationMatrix.c = -57891280;
