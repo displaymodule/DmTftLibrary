@@ -246,7 +246,7 @@ void DmTftRa8875::init(enum RA8875Size size) {
 		setHeight(_height);
 		// PLL init 
 		// 20MHz*(10+1)/((RA8875_PLLC1_PLLDIV1 +1) * 2^RA8875_PLLC2_DIV4))
-		writeReg(0x88, 0x00 + 10);
+		writeReg(0x88, 0x00 + 11);
 		delay(1);
 		writeReg(0x89, 0x02);
 		delay(1);
