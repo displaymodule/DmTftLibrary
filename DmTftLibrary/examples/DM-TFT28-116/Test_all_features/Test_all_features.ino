@@ -1,5 +1,5 @@
 /**********************************************************************************************
- Copyright (c) 2014 DisplayModule. All rights reserved.
+ Copyright (c) 2015 DisplayModule. All rights reserved.
 
  Redistribution and use of this source code, part of this source code or any compiled binary
  based on this source code is permitted as long as the above copyright notice and following
@@ -9,27 +9,24 @@
  THIS SOFTWARE IS SUPPLIED "AS IS" WITHOUT ANY WARRANTIES AND SUPPORT. DISPLAYMODULE ASSUMES
  NO RESPONSIBILITY OR LIABILITY FOR THE USE OF THE SOFTWARE.
  ********************************************************************************************/
-
 #include <SPI.h>
+#include <Wire.h>
 #include <SPIFlash.h> // SPIFlash library from lowpowerlab (https://github.com/LowPowerLab/SPIFlash)
 #include <SD.h>
 #include <DmTftIli9341.h>
-#include <DmTouch.h>
+#include <DmTpFt6x06.h>
 #include <DmDrawBmpFromSpiFlash.h>
 #include <DmDrawBmpFromSdCard.h>
-#include <utility/DmTouchCalibration.h>
 
 #define TFT_CS  10
 #define SD_CS   8
 #define F_CS    6
-#define T_CS    4
-#define T_IRQ   3
+#define T_IRQ   2
 
 DmTftIli9341 tft = DmTftIli9341();
 DmDrawBmpFromSpiFlash spiFlashImage = DmDrawBmpFromSpiFlash();
 DmDrawBmpFromSdCard sdCardImage = DmDrawBmpFromSdCard();
-DmTouch dmTouch = DmTouch(DmTouch::DM_TFT28_105);
-DmTouchCalibration calibration = DmTouchCalibration(&tft, &dmTouch);
+DmTpFt6x06 dmTouch = DmTpFt6x06(DmTpFt6x06::DM_TFT28_116 );
 
 SPIFlash spiFlash(F_CS, 0xEF40);
 uint16_t textRow = 20;
@@ -39,13 +36,11 @@ void setup() {
   pinMode(TFT_CS, OUTPUT);
   pinMode(SD_CS, OUTPUT);  
   pinMode(F_CS, OUTPUT);
-  pinMode(T_CS, OUTPUT);
   digitalWrite(TFT_CS, HIGH);
   digitalWrite(SD_CS, HIGH);
   digitalWrite(F_CS, HIGH);
-  digitalWrite(T_CS, HIGH);
   
-  //Serial.begin(9600);
+  //Serial.begin(115200);
   
   Serial.print(F("Free RAM is: "));
   Serial.println(freeRam());
@@ -54,7 +49,6 @@ void setup() {
   tft.init();
   Serial.println(F("Init Touch drivers"));
   dmTouch.init();
-  dmTouch.setCalibrationMatrix(calibration.getDefaultCalibrationData((int)DmTouch::DM_TFT28_105));  
   
   tft.drawString(35, 10, "www.displaymodule.com");
   
@@ -166,6 +160,8 @@ void WaitForSquareToBePressed(int x, int y, int width, int length) {
   while (!squarePressed) {
     if (dmTouch.isTouched()) {
       dmTouch.readTouchData(posX, posY, touched);
+      posX = map(posX, 0, 240, 240, 0);
+      posY = map(posY, 0, 320, 320, 0);  
       if (posX >= x && posX <= x+width && posY >= y && posY <= y+length) {
         squarePressed = 1;
       }

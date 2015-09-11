@@ -17,14 +17,14 @@
   #include <Arduino.h>
   #include <avr/pgmspace.h>
   #include <SPI.h>
-  
+  #include <Wire.h>
   // Clear bit, Set bit, High pulse and Low pulse macros
   #define gbi(reg, _bitmask) ((*reg) & (_bitmask))
   #define cbi(reg, _bitmask) *reg &= ~_bitmask
   #define sbi(reg, _bitmask) *reg |= _bitmask
   #define pulse_high(reg, _bitmask) sbi(reg, _bitmask); cbi(reg, _bitmask);
   #define pulse_low(reg, _bitmask) cbi(reg, _bitmask); sbi(reg, _bitmask);
-
+  #define delay_us(us) delayMicroseconds(us)
   // Map of mandatory pin names, from Arduino names to D* and A*
   #define D0   0
   #define D1   1
@@ -75,7 +75,7 @@
   #define pulse_low(reg, _bitmask) do { *(reg) = 0; *(reg) = 1; } while(0)
   #define constrain(amt,low,high) ((amt)<=(low)?(low):((amt)>(high)?(high):(amt)))
   #define delay(ms) wait_ms(ms)
-  
+  #define delay_us(us) wait_us(us)
   // Map of mandatory pin names, from Arduino names to D* and A*
   #if defined(__LPC407x_8x_177x_8x_H__)
     #define D0   p10
