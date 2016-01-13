@@ -19,6 +19,12 @@ This is Display Module TFT library which supports it's displays. Have a look at 
 
 * v1.1 Add suport for DM-TFT43-108
 
+* v1.2 Add support for DM-TFT18-308, DM-TFT18-309/310, DM-TFT24-311/312, DM-TFT24-313/314, DM-TFT24-315/316, DM-TFT35-323/324
+
+* v1.3 Add support for DM-TFT43-326/327, DM-TFT50-317/318.
+
+* v1.4 Add support for Capacitive Touch Module DM-TFT28-116.
+
 ### How to install the library ###
 
 1. Download the library and unzip DmDrawBmp and DmTftLibrary to your Arduino library folder.
